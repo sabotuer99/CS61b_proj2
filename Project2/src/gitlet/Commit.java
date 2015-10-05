@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class Commit implements Serializable{
 
 	private String id;
-	private String parentId;
+	private Commit parent;
 	private Long timeStamp;
 	private String message;
 	
@@ -15,9 +15,9 @@ public class Commit implements Serializable{
 	
 	public Commit(){};
 	
-	public Commit(String id, String parentId, Long timeStamp, String message, HashMap<String, String> filePointers){
+	public Commit(String id, Commit parent, Long timeStamp, String message, HashMap<String, String> filePointers){
 		this.id = id;
-		this.parentId = parentId;
+		this.parent = parent;
 		this.timeStamp = timeStamp;
 		this.message = message;
 		this.filePointers = filePointers;
@@ -26,8 +26,8 @@ public class Commit implements Serializable{
 	public String getId() {
 		return id;
 	}
-	public String getParentId() {
-		return parentId;
+	public Commit getParent() {
+		return parent;
 	}
 	public Long getTimeStamp() {
 		return timeStamp;
