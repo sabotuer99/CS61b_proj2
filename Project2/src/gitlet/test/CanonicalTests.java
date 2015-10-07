@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class CanonicalTests extends BaseTest{
@@ -17,6 +18,21 @@ public class CanonicalTests extends BaseTest{
 					""+
 					"=== Files Marked for Removal ===";
 	
+	@Override
+	@After
+	public void tearDown(){
+		super.tearDown();
+		
+		checkAndDelete("some_folder");
+		checkAndDelete("diary");
+		checkAndDelete("wug.txt");
+	}
+	
+	private void checkAndDelete(String name){
+		File f = new File(name);
+		if(f.exists())
+			recursiveDelete(f);
+	}
 	
 	@Test
 	public void argv_noSubcommand(){
@@ -88,8 +104,7 @@ public class CanonicalTests extends BaseTest{
 		//Act
 		gitlet("init");
 		
-		//Assert
-		
+		//Assert		
 		assertTrue(f1.exists());
 		assertTrue(f2.exists());
 		assertEquals(2, f3.list().length);
