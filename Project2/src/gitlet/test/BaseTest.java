@@ -61,10 +61,18 @@ public class BaseTest {
      * The '...' syntax allows you to pass in an arbitrary number of String
      * arguments, which are packaged into a String[].
      */
-    protected String gitlet(String... args) {
+    // returns just Stdout as a string
+    protected String gitlet(String...args){
+    	return gitletErr(args)[0];
+    }
+    
+    //returns Stdout and Stderr in a string array
+    protected String[] gitletErr(String... args) {
         PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
         InputStream originalIn = System.in;
         ByteArrayOutputStream printingResults = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorResults = new ByteArrayOutputStream();
         try {
             /*
              * Below we change System.out, so that when you call
@@ -72,6 +80,7 @@ public class BaseTest {
              * instead be added to the printingResults object.
              */
             System.setOut(new PrintStream(printingResults));
+            System.setErr(new PrintStream(errorResults));
 
             /*
              * Prepares the answer "yes" on System.In, to pretend as if a user
@@ -92,8 +101,12 @@ public class BaseTest {
              */
             System.setOut(originalOut);
             System.setIn(originalIn);
+            System.setErr(originalErr);
         }
-        return printingResults.toString();
+        
+        //return the string array, stripping out the newlines to make assertions simpler
+        return new String[]{ printingResults.toString().replace("\n", "").replace("\r", ""), 
+        		             errorResults.toString().replace("\n", "").replace("\r", "")};
     }
 
     /**
