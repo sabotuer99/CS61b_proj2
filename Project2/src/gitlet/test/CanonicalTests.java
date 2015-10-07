@@ -78,6 +78,8 @@ public class CanonicalTests extends BaseTest{
 	public void init_doesNotModifyExistingRepo() throws IOException{
 		//Arrange
 		gitlet("init");
+		File f3 = new File("expected");
+		f3.mkdir();
 		File f1 = new File("expected/foo");
 		f1.mkdir();
 		File f2 = new File("expected/world");
@@ -87,7 +89,7 @@ public class CanonicalTests extends BaseTest{
 		gitlet("init");
 		
 		//Assert
-		File f3 = new File("expected");
+		
 		assertTrue(f1.exists());
 		assertTrue(f2.exists());
 		assertEquals(2, f3.list().length);
