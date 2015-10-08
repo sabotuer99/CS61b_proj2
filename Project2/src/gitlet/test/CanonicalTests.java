@@ -90,16 +90,14 @@ public class CanonicalTests extends BaseTest{
 		assertEquals("A Gitlet repo already exists", result[1]);
 	}
 	
+	//This test case seems to dig a bit in to implementation details...
 	@Test
 	public void init_doesNotModifyExistingRepo() throws IOException{
 		//Arrange
 		gitlet("init");
-		File f3 = new File("expected");
-		f3.mkdir();
-		File f1 = new File("expected/foo");
-		f1.mkdir();
-		File f2 = new File("expected/world");
-		f2.createNewFile();
+		File f1 = createDirectory("expected");
+		File f2 = createDirectory("expected/foo");
+		File f3 = createFile("expected/world", "hello");
 
 		//Act
 		gitlet("init");
@@ -110,7 +108,7 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(2, f3.list().length);
 		
 		//Cleanup
-		recursiveDelete(f3);
+		checkAndDelete("expected");
 	}
 	
 	@Test
@@ -143,10 +141,11 @@ public class CanonicalTests extends BaseTest{
 	@Test
 	public void status_exampleFromSpec() throws IOException{
 		//Arrange
+		createFile("wug.txt", "");
+		createDirectory("some_folder");
+		createFile("goodbye.txt", "");
+		createFile("some_folder/wugs.txt", "");
 		gitlet("init");
-		new File("some_folder").mkdir();
-		new File("wug.txt").createNewFile();
-		new File("some_folder/wugs.txt").createNewFile();
 		gitlet("branch", "other-branch");
 		gitlet("add", "goodbye.txt");
 		gitlet("commit", "Add goodbye.txt");
@@ -170,6 +169,10 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
+		
+		//Cleanup
+		checkAndDelete("some_folder");
+		checkAndDelete("wug.txt");
 	}
 	
 	@Test
@@ -189,7 +192,7 @@ public class CanonicalTests extends BaseTest{
 	public void add_fileNotModified() throws IOException{
 		//Arrange
 		gitlet("init");
-		new File("diary").createNewFile();
+		createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("commit", "First day");
 		
@@ -199,13 +202,16 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("File has not been modified since the last commit.", result[0]);
 		assertEquals("File has not been modified since the last commit.", result[1]);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void add_addedRepeatedly() throws IOException{
 		//Arrange
 		gitlet("init");
-		new File("diary").createNewFile();
+		createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("add", "diary");
 		gitlet("add", "diary");
@@ -224,13 +230,16 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void add_addAndUnmark() throws IOException{
 		//Arrange
 		gitlet("init");
-		new File("diary").createNewFile();
+		createFile("diary", "hello");
 
 		//Act
 		String result1 = gitlet("status");
@@ -254,13 +263,16 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(expected1, result1);
 		assertEquals(expected2, result2);
 		assertEquals(expected1, result3);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void rm_removeAndUnmark() throws IOException{
 		//Arrange
 		gitlet("init");
-		new File("diary").createNewFile();
+		createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("commit", "First day");
 
@@ -285,14 +297,16 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(expected1, result1);
 		assertEquals(expected2, result2);
 		assertEquals(expected1, result3);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void rm_keepExistingFiles() throws IOException{
 		//Arrange
 		gitlet("init");
-		File f1 = new File("diary");
-		f1.createNewFile();
+		File f1 = createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("commit", "First day");
 
@@ -305,14 +319,16 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertTrue(result1);
 		assertTrue(result2);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void rm_fileNotHere() throws IOException{
 		//Arrange
 		gitlet("init");
-		File f1 = new File("diary");
-		f1.createNewFile();
+		File f1 = createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("commit", "First day");
 		recursiveDelete(f1);
@@ -324,14 +340,16 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		//no output on Stdout or Stderr...
 		assertTrue(result1[0] == null && result1[1] == null && result2[0] == null && result2[1] == null);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void rm_repeatedlyRemove() throws IOException{
 		//Arrange
 		gitlet("init");
-		File f1 = new File("diary");
-		f1.createNewFile();
+		createFile("diary", "hello");
 		gitlet("add", "diary");
 		gitlet("commit", "First day");
 
@@ -353,6 +371,9 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
+		
+		//Cleanup
+		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -382,4 +403,217 @@ public class CanonicalTests extends BaseTest{
 		assertEquals("No reason to remove the file.", result[0]);
 		assertEquals("Cannot remove: file was not tracked or added.", result[1]);
 	}
+	
+	@Test
+	public void commit_normalAddWithSanityCheck(){
+		//Arrange
+		//Act
+			gitlet("init");
+			createFile("foo", "Yo");
+			gitlet("add", "foo");
+		String[] result1 = gitletErr("commit", "Greetings!");
+			createFile("bar", "Bye");
+			createFile("foo", "Yoooooo");
+			gitlet("add", "foo");
+			gitlet("add", "bar");
+		String[] result2 = gitletErr("commit", "lalala");
+			createFile("foo", getText("foo") + "ooooooooooooo");
+			gitlet("add", "foo");
+		String[] result3 = gitletErr("commit", "longer foo");
+		
+		//Assert
+		assertTrue("Should be no output on Stdout", result1[0] == null && result2[0] == null && result3[0] == null);
+		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null && result3[1] == null);
+		
+		//cleanup
+		recursiveDelete(new File("foo"));
+		recursiveDelete(new File("bar"));
+	}
+	
+	@Test
+	public void commit_normalAddAndRemove(){
+		//Arrange
+		//Act
+			gitlet("init");
+			createFile("foo", "Yo");
+			gitlet("add", "foo");
+		String[] result1 = gitletErr("commit", "aaa");
+			gitlet("rm", "foo");
+		String[] result2 = gitletErr("commit", "bbb");
+			createFile("bar", "asdf");
+			createFile("foo", "Yo");
+			gitlet("add", "foo");
+			gitlet("add", "bar");
+		String[] result3 = gitletErr("commit", "ccc");
+			gitlet("rm", "foo");
+			createFile("baz", getText("foo"));
+			gitlet("add", "baz");
+		String[] result4 = gitletErr("commit", "ddd");
+		
+		//Assert
+		assertTrue("Should be no output on Stdout", result1[0] == null && result2[0] == null 
+				&& result3[0] == null && result4[0] == null);
+		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null 
+				&& result3[1] == null && result4[1] == null);
+		
+		//cleanup
+		recursiveDelete(new File("foo"));
+		recursiveDelete(new File("bar"));
+		recursiveDelete(new File("baz"));
+	}
+	
+	@Test
+	public void commit_normalAddWithContentCheck(){
+		gitlet("init");
+		
+		//get baseline file count
+		File f = new File(System.getProperty("user.dir"));
+		int baselineFileCount = f.list().length;			
+				
+		createFile("casual", "Hey");
+		createFile("polite", "おはようございます");
+		gitlet("add", "casual");
+		gitlet("add", "polite");
+		
+		String[] result = gitletErr("commit", "Greetings!"); 		
+		assertTrue("Should be no output on Stdout", result[0] == null);
+		assertTrue("Should be no output on Stderr", result[1] == null);
+		
+		recursiveDelete(new File("casual"));
+		recursiveDelete(new File("polite"));
+		gitlet("branch", "exotic");
+		//
+		// 1st check - exotic
+		//
+		gitlet("checkout", "exotic");
+		assertEquals("file content doesn't match", "Hey", getText("casual"));
+		assertEquals("file content doesn't match", "おはようございます", getText("polite"));
+		recursiveDelete(new File("casual"));
+		recursiveDelete(new File("polite"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		createFile("weird", "Selama Pagi");
+		gitlet("add", "weird");
+		result = gitletErr("commit", "something from Nichijou"); 		
+		assertTrue("Should be no output on Stdout", result[0] == null);
+		assertTrue("Should be no output on Stderr", result[1] == null);
+		//
+		// 2nd check - master
+		//
+		// Untracked files should not be removed
+		gitlet("checkout", "master");
+		assertEquals("file content doesn't match", "Hey", getText("casual"));
+		assertEquals("file content doesn't match", "おはようございます",  getText("polite"));
+		assertEquals("file content doesn't match", "Selama Pagi",  getText("weird"));
+		recursiveDelete(new File("casual"));
+		recursiveDelete(new File("polite"));
+		recursiveDelete(new File("weird"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		//
+		// 3rd check - exotic
+		//
+		gitlet("checkout", "exotic");
+		assertEquals("file content doesn't match", "Hey", getText("casual"));
+		assertEquals("file content doesn't match", "おはようございます",  getText("polite"));
+		assertEquals("file content doesn't match", "Selama Pagi",  getText("weird"));
+		recursiveDelete(new File("casual"));
+		recursiveDelete(new File("polite"));
+		recursiveDelete(new File("weird"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		//
+		// 4th check - master
+		//
+		gitlet("checkout", "master");
+		assertEquals("file content doesn't match", "Hey", getText("casual"));
+		assertEquals("file content doesn't match", "おはようございます",  getText("polite"));
+		recursiveDelete(new File("casual"));
+		recursiveDelete(new File("polite"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+	}
+	
+	@Test
+	public void commit_fileModifiedAfterAdd(){
+		//Arrange
+		//Act
+		gitlet("init");
+		createFile("foo", "old");
+		gitlet("add", "foo");
+		createFile("foo", "new");
+		gitlet("commit", "I shall store the new version");
+		recursiveDelete(new File("foo"));
+		gitlet("checkout", "foo");
+		
+		//Assert
+		assertEquals("commit should take the latest version of a file, not the add time version",
+				"new", getText("foo"));
+		
+		//Cleanup
+		recursiveDelete(new File("foo"));
+	}
+	
+	@Test
+	public void commit_fileMarkedButNotModified(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "old");
+		gitlet("add", "foo");
+		gitlet("commit", "something to begin with");
+		createFile("foo", "new");
+		gitlet("add", "foo");
+		createFile("foo", "old");
+		
+		//Act
+		String[] result = gitletErr("commit", "Nothing changed");
+		
+		//Assert
+		assertTrue("Should be no output on Stdout", result[0] == null);
+		assertTrue("Should be no output on Stderr", result[1] == null);
+		
+		//Cleanup
+		recursiveDelete(new File("foo"));
+	}
+	
+	@Test
+	public void commit_noCommitMessage(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "");
+		gitlet("add", "foo");
+		
+		//Act
+		String[] result = gitletErr("commit");
+		
+		//Assert
+		assertEquals("Please enter a commit message.", result[0]);
+		assertEquals("Need more arguments" + "Usage: java Gitlet commit MESSAGE", result[1]);
+		
+		//Cleanup
+		recursiveDelete(new File("foo"));
+	}
+	
+	@Test
+	public void commit_emptyCommit(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result = gitletErr("commit", "Empty commit (should fail)");
+		
+		//Assert
+		assertEquals("No changes added to the commit.", result[0]);
+		assertEquals("No changes added to the commit.", result[1]);
+	}
+	
+	@Test
+	public void log_sanityCheck(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result = gitletErr("commit", "Empty commit (should fail)");
+		
+		//Assert
+		assertEquals("No changes added to the commit.", result[0]);
+		assertEquals("No changes added to the commit.", result[1]);
+	}
+	
 }

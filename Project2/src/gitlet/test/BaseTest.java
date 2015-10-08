@@ -114,8 +114,9 @@ public class BaseTest {
      * characters).
      */
     protected String getText(String fileName) {
+    	String _filename = fileName;//TESTING_DIR + fileName;
         try {
-            byte[] encoded = Files.readAllBytes(Paths.get(fileName));
+            byte[] encoded = Files.readAllBytes(Paths.get(_filename));
             return new String(encoded, StandardCharsets.UTF_8);
         } catch (IOException e) {
             return "";
@@ -126,8 +127,10 @@ public class BaseTest {
      * Creates a new file with the given fileName and gives it the text
      * fileText.
      */
-    protected void createFile(String fileName, String fileText) {
-        File f = new File(fileName);
+    protected File createFile(String fileName, String fileText) {
+    	String _filename = fileName;//TESTING_DIR + fileName;
+    	
+        File f = new File(_filename);
         if (!f.exists()) {
             try {
                 f.createNewFile();
@@ -135,13 +138,40 @@ public class BaseTest {
                 e.printStackTrace();
             }
         }
-        writeFile(fileName, fileText);
+        writeFile(_filename, fileText);
+        return f;
+    }
+    
+    /**
+     * Creates a new directory with the given name 
+     */
+    protected File createDirectory(String name) {
+    	String _name = name;//TESTING_DIR + name;
+    	
+        File f = new File(_name);
+        if (!f.exists()) {
+                f.mkdir();
+        }
+        
+        return f;
+    }
+    
+    /**
+     * Creates a new directory with the given name 
+     */
+    protected void deleteDirectory(String name) {
+    	String _name = name;//TESTING_DIR + name;
+    	
+        File f = new File(_name);
+        if (f.exists()) {
+                recursiveDelete(f);
+        }
     }
 
     /**
      * Replaces all text in the existing file with the given text.
      */
-    protected void writeFile(String fileName, String fileText) {
+    private void writeFile(String fileName, String fileText) {
         FileWriter fw = null;
         try {
             File f = new File(fileName);
