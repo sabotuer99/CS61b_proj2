@@ -91,6 +91,7 @@ public class CanonicalTests extends BaseTest{
 	}
 	
 	//This test case seems to dig a bit in to implementation details...
+	//TODO make this test case not dependent on implementation
 	@Test
 	public void init_doesNotModifyExistingRepo() throws IOException{
 		//Arrange
@@ -103,9 +104,10 @@ public class CanonicalTests extends BaseTest{
 		gitlet("init");
 		
 		//Assert		
-		assertTrue(f1.exists());
+		assertEquals(2, f1.list().length);
+		assertTrue(f3.exists());
 		assertTrue(f2.exists());
-		assertEquals(2, f3.list().length);
+		
 		
 		//Cleanup
 		checkAndDelete("expected");

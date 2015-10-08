@@ -50,7 +50,7 @@ public class GitletPublicTest extends BaseTest{
         gitlet("init");
         gitlet("add", wugFileName);
         gitlet("commit", "added wug");
-        writeFile(wugFileName, "This is not a wug.");
+        createFile(wugFileName, "This is not a wug.");
         gitlet("checkout", wugFileName);
         assertEquals(wugText, getText(wugFileName));
     }
