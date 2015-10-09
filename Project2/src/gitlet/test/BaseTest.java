@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Before;
@@ -233,4 +235,13 @@ public class BaseTest {
         }
         return messages;
     }
+    
+	protected String getLastCommitId(String logOutput){
+
+		Pattern p = Pattern.compile("Commit ([\\d\\w]+)\\.");
+        Matcher matcher = p.matcher(logOutput);
+        matcher.find();
+        
+        return matcher.group(1);
+	}
 }
