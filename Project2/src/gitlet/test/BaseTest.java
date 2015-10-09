@@ -12,6 +12,8 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +25,8 @@ public class BaseTest {
     /* matches either unix/mac or windows line separators */
     protected static final String LINE_SEPARATOR = "\r\n|[\r\n]";
 
+    
+    private List<String> createdFiles;
     /**
      * Deletes existing gitlet system, resets the folder that stores files used
      * in testing.
@@ -41,6 +45,8 @@ public class BaseTest {
             recursiveDelete(f);
         }
         f.mkdirs();
+        
+        createdFiles = new ArrayList<String>();
     }
     
     @After
@@ -49,7 +55,17 @@ public class BaseTest {
         if (f.exists()) {
             recursiveDelete(f);
         }
+        
+        for(String name : createdFiles){
+        	checkAndDelete(name);
+        }
     }
+    
+	private void checkAndDelete(String name){
+		File f = new File(name);
+		if(f.exists())
+			recursiveDelete(f);
+	}
     /**
      * Convenience method for calling Gitlet's main. Anything that is printed
      * out during this call to main will NOT actually be printed out, but will
@@ -129,6 +145,7 @@ public class BaseTest {
      */
     protected File createFile(String fileName, String fileText) {
     	String _filename = fileName;//TESTING_DIR + fileName;
+    	createdFiles.add(fileName);
     	
         File f = new File(_filename);
         if (!f.exists()) {
@@ -147,6 +164,7 @@ public class BaseTest {
      */
     protected File createDirectory(String name) {
     	String _name = name;//TESTING_DIR + name;
+    	createdFiles.add(name);
     	
         File f = new File(_name);
         if (!f.exists()) {

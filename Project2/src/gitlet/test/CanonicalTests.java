@@ -4,8 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Test;
 
 public class CanonicalTests extends BaseTest{
@@ -18,21 +19,6 @@ public class CanonicalTests extends BaseTest{
 					""+
 					"=== Files Marked for Removal ===";
 	
-	@Override
-	@After
-	public void tearDown(){
-		super.tearDown();
-		
-		checkAndDelete("some_folder");
-		checkAndDelete("diary");
-		checkAndDelete("wug.txt");
-	}
-	
-	private void checkAndDelete(String name){
-		File f = new File(name);
-		if(f.exists())
-			recursiveDelete(f);
-	}
 	
 	@Test
 	public void argv_noSubcommand(){
@@ -107,10 +93,6 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(2, f1.list().length);
 		assertTrue(f3.exists());
 		assertTrue(f2.exists());
-		
-		
-		//Cleanup
-		checkAndDelete("expected");
 	}
 	
 	@Test
@@ -171,10 +153,6 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
-		
-		//Cleanup
-		checkAndDelete("some_folder");
-		checkAndDelete("wug.txt");
 	}
 	
 	@Test
@@ -204,9 +182,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("File has not been modified since the last commit.", result[0]);
 		assertEquals("File has not been modified since the last commit.", result[1]);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -232,9 +207,6 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -265,9 +237,6 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(expected1, result1);
 		assertEquals(expected2, result2);
 		assertEquals(expected1, result3);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -299,9 +268,6 @@ public class CanonicalTests extends BaseTest{
 		assertEquals(expected1, result1);
 		assertEquals(expected2, result2);
 		assertEquals(expected1, result3);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -321,9 +287,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertTrue(result1);
 		assertTrue(result2);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -342,9 +305,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		//no output on Stdout or Stderr...
 		assertTrue(result1[0] == null && result1[1] == null && result2[0] == null && result2[1] == null);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
@@ -373,16 +333,13 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals(expected, result);
-		
-		//Cleanup
-		checkAndDelete("diary");
 	}
 	
 	@Test
 	public void rm_untrackedFile() throws IOException{
 		//Arrange
 		gitlet("init");
-		File f1 = new File("diary");
+		File f1 = createFile("diary", "");
 		f1.createNewFile();
 
 		//Act
@@ -426,10 +383,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertTrue("Should be no output on Stdout", result1[0] == null && result2[0] == null && result3[0] == null);
 		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null && result3[1] == null);
-		
-		//cleanup
-		recursiveDelete(new File("foo"));
-		recursiveDelete(new File("bar"));
 	}
 	
 	@Test
@@ -457,11 +410,6 @@ public class CanonicalTests extends BaseTest{
 				&& result3[0] == null && result4[0] == null);
 		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null 
 				&& result3[1] == null && result4[1] == null);
-		
-		//cleanup
-		recursiveDelete(new File("foo"));
-		recursiveDelete(new File("bar"));
-		recursiveDelete(new File("baz"));
 	}
 	
 	@Test
@@ -547,9 +495,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("commit should take the latest version of a file, not the add time version",
 				"new", getText("foo"));
-		
-		//Cleanup
-		recursiveDelete(new File("foo"));
 	}
 	
 	@Test
@@ -569,9 +514,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertTrue("Should be no output on Stdout", result[0] == null);
 		assertTrue("Should be no output on Stderr", result[1] == null);
-		
-		//Cleanup
-		recursiveDelete(new File("foo"));
 	}
 	
 	@Test
@@ -587,9 +529,6 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("Please enter a commit message.", result[0]);
 		assertEquals("Need more arguments" + "Usage: java Gitlet commit MESSAGE", result[1]);
-		
-		//Cleanup
-		recursiveDelete(new File("foo"));
 	}
 	
 	@Test
@@ -608,14 +547,126 @@ public class CanonicalTests extends BaseTest{
 	@Test
 	public void log_sanityCheck(){
 		//Arrange
+		createFile("aaa", "123");
+		createFile("bbb", "456");
+		createFile("ccc", "789");
+		createFile("aya", "yay");
 		gitlet("init");
+		gitlet("add", "aaa");
+		gitlet("commit", "1st");
+		gitlet("add", "bbb");
+		gitlet("commit", "2nd");
+		gitlet("add", "ccc");
+		gitlet("commit", "3rd");
+		gitlet("add", "aya");
 		
 		//Act
-		String[] result = gitletErr("commit", "Empty commit (should fail)");
+		String[] result = gitletErr("log");
 		
 		//Assert
-		assertEquals("No changes added to the commit.", result[0]);
-		assertEquals("No changes added to the commit.", result[1]);
+		assertNull(result[1]);
+		assertTrue("log output should contain the 3rd commit", result[0].contains("3rd"));
+		assertTrue("log output should contain the 2nd commit", result[0].contains("2rd"));
+		assertTrue("log output should contain the 1st commit", result[0].contains("1st"));
+		assertTrue("log output should contain the 0th commit", result[0].contains("initial commit"));
+		
 	}
+	
+	@Test
+	public void log_formatCheck(){
+		//Arrange
+		createFile("aaa", "123");
+		createFile("bbb", "456");
+		createFile("ccc", "789");
+		createFile("aya", "yay");
+		gitlet("init");
+		gitlet("add", "aaa");
+		gitlet("commit", "1st");
+		gitlet("add", "bbb");
+		gitlet("commit", "2nd");
+		gitlet("add", "ccc");
+		gitlet("commit", "3rd");
+		gitlet("add", "aya");
+		
+		//Act
+		String[] result = gitletErr("log");
+		
+        Pattern p = Pattern.compile("(====[\\n\\s]?Commit \\d+\\.[\\n\\s]?\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}[\\n\\s][^=]+)*");
+        Matcher matcher = p.matcher(result[0]);
+			
+		//Assert
+		assertNull(result[1]);
+		assertTrue("log output not correct format!", matcher.matches());
+	}
+	
+	@Test
+	public void log_orderCheck(){
+		//Arrange
+		createFile("aaa", "123");
+		createFile("bbb", "456");
+		createFile("ccc", "789");
+		createFile("aya", "yay");
+		gitlet("init");
+		gitlet("add", "aaa");
+		gitlet("commit", "1st");
+		gitlet("add", "bbb");
+		gitlet("commit", "2nd");
+		gitlet("add", "ccc");
+		gitlet("commit", "3rd");
+		gitlet("add", "aya");
+		
+		//Act
+		String[] result = gitletErr("log");
+		int index3 = result[0].indexOf("3rd");
+		int index2 = result[0].indexOf("2nd");
+		int index1 = result[0].indexOf("1st");
+		int index0 = result[0].indexOf("initial commit");
+		
+		//Assert
+		assertNull(result[1]);
+		assertTrue("3rd commit should appear first", index3 < index2 && index3 < index1 && index3 < index0);
+		assertTrue("2nd commit should appear second", index2 < index1 && index2 < index0);
+		assertTrue("1st commit should appear third",  index1 < index0);
+	}
+	
+	@Test
+	public void log_shouldOnlyOutputOneChain(){
+		//Arrange
+		createFile("aaa", "123");
+		createFile("bbb", "456");
+		createFile("ccc", "789");
+		createFile("aya", "yay");
+		gitlet("init");
+		gitlet("add", "aaa");
+		gitlet("add", "bbb");
+		gitlet("commit", "1st");
+		gitlet("branch", "haha");
+		gitlet("add", "ccc");
+		gitlet("commit", "more");
+		gitlet("checkout", "haha");
+		gitlet("add", "aya");
+		gitlet("commit", "wow");
+		
+		//Act
+		String[] result1 = gitletErr("log");
+		gitlet("checkout", "master");
+		String[] result2 = gitletErr("log");
+		
+		//Assert
+		assertNull(result1[1]);
+		assertEquals("haha log should output exactly 3 commits", 3, extractCommitMessages(result1[0]));		
+		assertFalse("haha log output should not contain the 'more' commit", result1[0].contains("more"));
+		assertTrue("haha log output should contain the 'wow' commit", result1[0].contains("wow"));
+		assertTrue("haha log output should contain the '1st' commit", result1[0].contains("1st"));
+		assertTrue("haha log output should contain the initial commit", result1[0].contains("initial commit"));
+		
+		assertNull(result2[1]);
+		assertEquals("master log should output exactly 3 commits", 3, extractCommitMessages(result2[0]));
+		assertTrue("master log output should contain the 'more' commit", result2[0].contains("more"));
+		assertFalse("master log output should not contain the 'wow' commit", result2[0].contains("wow"));
+		assertTrue("master log output should contain the '1st' commit", result2[0].contains("1st"));
+		assertTrue("master log output should contain the initial commit", result2[0].contains("initial commit"));
+	}
+	
 	
 }
