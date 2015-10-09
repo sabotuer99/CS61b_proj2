@@ -240,8 +240,11 @@ public class BaseTest {
 
 		Pattern p = Pattern.compile("Commit ([\\d\\w]+)\\.");
         Matcher matcher = p.matcher(logOutput);
-        matcher.find();
-        
-        return matcher.group(1);
+        try{
+        	matcher.find();
+        	return matcher.group(1);
+        } catch (Exception ex){
+        	return "";
+        } 
 	}
 }
