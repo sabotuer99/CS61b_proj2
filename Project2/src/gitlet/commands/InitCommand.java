@@ -15,13 +15,20 @@ public class InitCommand implements ICommand {
 	}
 	
 	public boolean execute() {
-		File f = new File(".gitlet/");
+		File f = new File(".gitlet");
 		if(f.exists()){
 			return false;
 		} else {
 			
 			//get a reference to this directory, check if it's writable
 			//if it isn't writable, output error messages and return false
+			File thisFolder = new File(System.getProperty("user.dir"));
+			if(!thisFolder.canWrite()){
+				System.err.println("IO ERROR: Failed to create directory: .gitlet");
+					return false;
+			}
+			
+			
 			
 			//if it's writable, create the .gitlet folder
 			

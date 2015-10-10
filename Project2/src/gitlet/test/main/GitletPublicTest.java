@@ -1,10 +1,12 @@
-package gitlet.test;
+package gitlet.test.main;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import gitlet.test.BaseTest;
 
 import java.io.File;
+
 import org.junit.Test;
 
 /**

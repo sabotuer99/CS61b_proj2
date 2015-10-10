@@ -18,7 +18,7 @@ public class CommandParser {
 		ICommandFactory cf = findRequestedCommand(requestedCommandName);
 		
 		if(cf != null)
-			return cf.MakeCommand(args);
+			return cf.makeCommand(args);
 		else
 			return null;
 	}

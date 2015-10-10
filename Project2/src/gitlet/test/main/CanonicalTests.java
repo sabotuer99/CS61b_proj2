@@ -1,10 +1,11 @@
-package gitlet.test;
+package gitlet.test.main;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+//import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gitlet.test.BaseTest;
 
 import java.io.File;
 import java.io.IOException;

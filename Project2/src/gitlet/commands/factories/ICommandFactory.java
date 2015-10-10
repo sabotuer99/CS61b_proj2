@@ -7,5 +7,5 @@ public interface ICommandFactory {
 	String getCommandName();
 	String getDescription();
 	
-	ICommand MakeCommand(String[] args);
+	ICommand makeCommand(String[] args);
 }

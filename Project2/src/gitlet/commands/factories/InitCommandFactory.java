@@ -1,13 +1,14 @@
 package gitlet.commands.factories;
 
 import gitlet.commands.ICommand;
+import gitlet.commands.InitCommand;
 
 public class InitCommandFactory implements ICommandFactory {
 
 	@Override
 	public String getCommandName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "init";
 	}
 
 	@Override
@@ -17,9 +18,9 @@ public class InitCommandFactory implements ICommandFactory {
 	}
 
 	@Override
-	public ICommand MakeCommand(String[] args) {
+	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return null;
+		return new InitCommand();
 	}
 
 }
