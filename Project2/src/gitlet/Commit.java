@@ -95,9 +95,11 @@ public class Commit implements Serializable {
 	}
 	
 	public void save(){
-		String filename = ".gitlet/objects/" + this.id;
-		File f = new File(filename);
-		if(!f.exists()){
+		String directory = ".gitlet/objects/" + this.id;
+		String filename = directory + "/" + this.id;
+		File d = new File(directory);
+		if(!d.exists()){
+			d.mkdir();
 			try(
 			  OutputStream file = new FileOutputStream(filename);
 			  OutputStream buffer = new BufferedOutputStream(file);
@@ -108,7 +110,7 @@ public class Commit implements Serializable {
 					output.writeObject(this.parent.getId());				
 				}
 				else
-					output.writeObject("null");
+				output.writeObject("null");
 				output.writeObject(this.id);
 				output.writeObject(this.message);
 				output.writeObject(this.timeStamp);		
@@ -126,7 +128,7 @@ public class Commit implements Serializable {
 	public static Commit readFromDisk(String id){
 		System.out.println("Reading: " + id);
 		
-		String objDir = ".gitlet/objects/";
+		String objDir = ".gitlet/objects/" + id + "/";
 		File d = new File(objDir);
 		if(!d.exists()){
 			throw new IllegalArgumentException("Gitlet not initialized!");

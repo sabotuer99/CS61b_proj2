@@ -77,7 +77,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result = gitletErr("init");
 		
 		//Assert
-		assertEquals("A gitlet version control system already exists in the current directory.", result[1]);
+		assertEquals("A gitlet version control system already exists in the current directory.", result[0]);
 		assertEquals("A Gitlet repo already exists", result[1]);
 	}
 	
@@ -125,7 +125,7 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals("",result[0]);
-		assertEquals("IO ERROR: Failed to create directory: .gitlet", result);
+		assertEquals("IO ERROR: Failed to create directory: .gitlet", result[1]);
 	}
 	
 	@Test
