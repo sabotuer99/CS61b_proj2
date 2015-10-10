@@ -123,8 +123,10 @@ public class BaseTest {
         }
         
         //return the string array, stripping out the newlines to make assertions simpler
-        return new String[]{ printingResults.toString().replace("\n", "").replace("\r", ""), 
-        		             errorResults.toString().replace("\n", "").replace("\r", "")};
+        String stdout = printingResults.toString().replace("\n", "").replace("\r", "");
+        String stderr = errorResults.toString().replace("\n", "").replace("\r", "");
+        
+        return new String[]{ stdout, stderr };
     }
 
     /**

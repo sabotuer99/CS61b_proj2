@@ -45,14 +45,14 @@ public class CommitTests extends BaseTest{
 	
 	@Test
 	public void save_TestDefaultObject(){
-		new InitCommand().Execute();
+		new InitCommand().execute();
 		Commit sut = new Commit();
 		sut.save();
 	}
 	
 	@Test
 	public void readFromDisk_TestCommitRecovered(){
-		new InitCommand().Execute();
+		new InitCommand().execute();
 		Commit newCom = new Commit();
 		
 		HashMap<String, String> testMap = new HashMap<String, String>();

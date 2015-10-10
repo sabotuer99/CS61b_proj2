@@ -31,7 +31,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result = gitletErr();
 		
 		//Assert
-		assertNull(result[0]);
+		assertEquals("",result[0]);
 		assertEquals("Need a subcommand", result[1]);
 	}
 	
@@ -42,7 +42,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result = gitletErr("whosyourdaddy");
 		
 		//Assert
-		assertNull(result[0]);
+		assertEquals("",result[0]);
 		assertEquals("Unknown command: whosyourdaddy", result[1]);
 	}
 	
@@ -123,7 +123,7 @@ public class CanonicalTests extends BaseTest{
 		f.setWritable(true);
 		
 		//Assert
-		assertNull(result[0]);
+		assertEquals("",result[0]);
 		assertEquals("IO ERROR: Failed to create directory: .gitlet", result);
 	}
 	
@@ -581,7 +581,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result = gitletErr("log");
 		
 		//Assert
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 		assertTrue("log output should contain the 3rd commit", result[0].contains("3rd"));
 		assertTrue("log output should contain the 2nd commit", result[0].contains("2rd"));
 		assertTrue("log output should contain the 1st commit", result[0].contains("1st"));
@@ -612,7 +612,7 @@ public class CanonicalTests extends BaseTest{
         Matcher matcher = p.matcher(result[0]);
 			
 		//Assert
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 		assertTrue("log output not correct format!", matcher.matches());
 	}
 	
@@ -640,7 +640,7 @@ public class CanonicalTests extends BaseTest{
 		int index0 = result[0].indexOf("initial commit");
 		
 		//Assert
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 		assertTrue("3rd commit should appear first", index3 < index2 && index3 < index1 && index3 < index0);
 		assertTrue("2nd commit should appear second", index2 < index1 && index2 < index0);
 		assertTrue("1st commit should appear third",  index1 < index0);
@@ -670,14 +670,14 @@ public class CanonicalTests extends BaseTest{
 		String[] result2 = gitletErr("log");
 		
 		//Assert
-		assertNull(result1[1]);
+		assertEquals("",result1[1]);
 		assertEquals("haha log should output exactly 3 commits", 3, extractCommitMessages(result1[0]));		
 		assertFalse("haha log output should not contain the 'more' commit", result1[0].contains("more"));
 		assertTrue("haha log output should contain the 'wow' commit", result1[0].contains("wow"));
 		assertTrue("haha log output should contain the '1st' commit", result1[0].contains("1st"));
 		assertTrue("haha log output should contain the initial commit", result1[0].contains("initial commit"));
 		
-		assertNull(result2[1]);
+		assertEquals("",result2[1]);
 		assertEquals("master log should output exactly 3 commits", 3, extractCommitMessages(result2[0]));
 		assertTrue("master log output should contain the 'more' commit", result2[0].contains("more"));
 		assertFalse("master log output should not contain the 'wow' commit", result2[0].contains("wow"));
@@ -707,7 +707,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result1 = gitletErr("global-log");
 		
 		//Assert
-		assertNull(result1[1]);
+		assertEquals("",result1[1]);
 		assertEquals("global-log should output all 4 commits", 4, extractCommitMessages(result1[0]));		
 		assertTrue("global-log output should contain the 'more' commit", result1[0].contains("more"));
 		assertTrue("global-log output should contain the 'wow' commit", result1[0].contains("wow"));
@@ -738,7 +738,7 @@ public class CanonicalTests extends BaseTest{
         Matcher matcher = p.matcher(result[0]);
 			
 		//Assert
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 		assertTrue("global-log output not correct format!", matcher.matches());
 	}
 	
@@ -766,7 +766,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result1 = gitletErr("global-log");
 		
 		//Assert
-		assertNull(result1[1]);
+		assertEquals("",result1[1]);
 		assertEquals("global-log should output all 5 commits", 5, extractCommitMessages(result1[0]));		
 		assertTrue("global-log output should contain orphaned commits", result1[0].contains("to the beginning"));
 		assertTrue("global-log output should contain the current commit", result1[0].contains("hawayu"));
@@ -786,12 +786,12 @@ public class CanonicalTests extends BaseTest{
 		String[] result3 = gitletErr("branch", "some-more");
 		
 		//Assert -- all should be null (no output on Stdout or Stderr
-		assertNull(result1[0]);
-		assertNull(result2[0]);
-		assertNull(result3[0]);
-		assertNull(result1[1]);
-		assertNull(result2[1]);
-		assertNull(result3[1]);
+		assertEquals("",result1[0]);
+		assertEquals("",result2[0]);
+		assertEquals("",result3[0]);
+		assertEquals("",result1[1]);
+		assertEquals("",result2[1]);
+		assertEquals("",result3[1]);
 		
 	}
 	
@@ -933,9 +933,9 @@ public class CanonicalTests extends BaseTest{
 		String[] result3 = gitletErr("status");
 		
 		//Assert
-		assertNull(result1[1]);
-		assertNull(result2[1]);
-		assertNull(result3[1]);
+		assertEquals("",result1[1]);
+		assertEquals("",result2[1]);
+		assertEquals("",result3[1]);
 		assertEquals(expected1, result1[0]);
 		assertEquals(expected2, result2[0]);
 		assertEquals(expected1, result3[0]);
@@ -973,8 +973,8 @@ public class CanonicalTests extends BaseTest{
 		String[] result2 = gitletErr("status");
 		
 		//Assert
-		assertNull(result1[1]);
-		assertNull(result2[1]);
+		assertEquals("",result1[1]);
+		assertEquals("",result2[1]);
 		assertEquals(expected1, result1[0]);
 		assertEquals(expected1, result2[0]);
 	}
@@ -1056,28 +1056,28 @@ public class CanonicalTests extends BaseTest{
 		//Act
 		//Assert
 		String[] result = gitletErr("checkout", comid1, "foo");
-		assertNull("Should be no output on Stdout", result[0]);
-		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("Should be no output on Stdout","", result[0]);
+		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hi", getText("foo"));
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
 		result = gitletErr("checkout", "foo");
-		assertNull("Should be no output on Stdout", result[0]);
-		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("Should be no output on Stdout","", result[0]);
+		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hello", getText("foo"));
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
 		gitlet("rm", "foo");
 		result = gitletErr("checkout", "foo");
-		assertNull("Should be no output on Stdout", result[0]);
-		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("Should be no output on Stdout","", result[0]);
+		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hello", getText("foo"));
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
 		gitlet("rm", "foo");
 		result = gitletErr("checkout", comid1, "foo");
-		assertNull("Should be no output on Stdout", result[0]);
-		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("Should be no output on Stdout","", result[0]);
+		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hi", getText("foo"));
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 	}
@@ -1094,8 +1094,8 @@ public class CanonicalTests extends BaseTest{
 		String[] result2 = gitletErr("commit", "This","is","a","sentence");
 		
 		//Assert
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		assertEquals("Too many arguments", result2[0]);
 		assertEquals("Usage: java Gitlet commit MESSAGE", result2[1]);
 	}
@@ -1130,33 +1130,33 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		gitlet("add", "1");
 		String[] result1 = gitletErr("commit", ".");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "2");
 		result1 = gitletErr("commit", "..");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "3");
 		result1 = gitletErr("commit", "/");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "4");
 		result1 = gitletErr("commit", "\\");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "5");
 		result1 = gitletErr("commit", "*");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "6");
 		result1 = gitletErr("commit", "~");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 	}
 	
 	@Test
@@ -1175,38 +1175,38 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		gitlet("add", "1");
 		String[] result1 = gitletErr("commit", "qwertyuiopasdfghjklzxcvbnm,QWERTYUIOPASDFGHJKLZXCVBNM,1234567890");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "2");
 		result1 = gitletErr("commit", "\\`~!@#$%^&*()_+-=[]\\{}|,./<>?:\";'\"'\"");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "3");
 		result1 = gitletErr("commit", "色は匂へえど いつか散りぬるを さ迷うことさえ 許せなかった");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "4");
 		result1 = gitletErr("commit", "≈₂ïç");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "5");
 		result1 = gitletErr("commit", "     ");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "6");
 		result1 = gitletErr("commit", "　");
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 		
 		gitlet("add", "7");
 		result1 = gitletErr("commit", "\n\r\t\f\'\"\\"); //eclipse wouldn't let me put the \a, \0, or \e in
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 	}
 	
 	@Test
@@ -1223,8 +1223,8 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		gitlet("add", "foo");
 		String[] result1 = gitletErr("commit", message);
-		assertNull("Should be no output on Stdout", result1[0]);
-		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Should be no output on Stdout","", result1[0]);
+		assertEquals("Should be no output on Stderr","", result1[1]);
 	}
 	
 	@Test
@@ -1296,7 +1296,7 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals("Found no commit with that message", result[0]);
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 	}
 	
 	@Test
@@ -1317,9 +1317,9 @@ public class CanonicalTests extends BaseTest{
 		assertEquals("Found no commit with that message", result1[0]);
 		assertEquals("Found no commit with that message", result2[0]);
 		assertEquals("find 'foo bar baz' should list the 2nd commit", comid1, result3[0]);
-		assertNull(result1[1]);
-		assertNull(result2[1]);
-		assertNull(result3[1]);
+		assertEquals("",result1[1]);
+		assertEquals("",result2[1]);
+		assertEquals("",result3[1]);
 	}
 	
 	@Test
@@ -1345,9 +1345,9 @@ public class CanonicalTests extends BaseTest{
 		assertEquals("find 'say hi' should list the 2nd commit", comid1, result1[0]);
 		assertEquals("find 'say hello' should list the 3rd commit", comid2, result2[0]);
 		assertEquals("find 'initial commit' should list the ist commit", comid0, result3[0]);
-		assertNull(result1[1]);
-		assertNull(result2[1]);
-		assertNull(result3[1]);
+		assertEquals("",result1[1]);
+		assertEquals("",result2[1]);
+		assertEquals("",result3[1]);
 	}
 	
 	@Test
@@ -1371,7 +1371,7 @@ public class CanonicalTests extends BaseTest{
 		assertTrue("all 3 commits should be listed", result3[0].contains(comid0));
 		assertTrue("all 3 commits should be listed", result3[0].contains(comid1));
 		assertTrue("all 3 commits should be listed", result3[0].contains(comid2));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 	}
 	
 	@Test
@@ -1405,7 +1405,7 @@ public class CanonicalTests extends BaseTest{
 		assertTrue("all 3 commits should be listed", result3[0].contains(com0));
 		assertTrue("all 3 commits should be listed", result3[0].contains(comL));
 		assertTrue("all 3 commits should be listed", result3[0].contains(comOrphan));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 	}
 	
 	@Test
@@ -1443,7 +1443,7 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("file content doesn't match", "hello", getText("foo.conflicted"));
 		assertEquals("file content doesn't match", "yo", getText("bar"));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 		checkAndDelete("foo.conflicted");
 		checkAndDelete("bar");
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);		
@@ -1479,7 +1479,7 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("file content doesn't match", "hello", getText("foo"));
 		assertEquals("file content doesn't match", "yo", getText("bar"));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 		checkAndDelete("foo");
 		checkAndDelete("bar");
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);		
@@ -1512,7 +1512,7 @@ public class CanonicalTests extends BaseTest{
 		String[] result3 = gitletErr("merge", "master");
 		
 		//Assert
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);		
 	}
 	
@@ -1565,7 +1565,7 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals("Cannot rebase a branch with itself.", result[0]);
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 	}
 	
 	@Test
@@ -1605,7 +1605,7 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("rebasing onto a future commit should only move the branch pointer", log1, gitlet("log"));
 		assertEquals("rebasing onto a future commit should only move the branch pointer", glog1, gitlet("global-log"));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 		assertEquals("file content doesn't match", "I never change", getText("eternal"));
 		assertEquals("file content doesn't match", "hawayu", getText("foo"));
 		assertEquals("file content doesn't match", "yo", getText("bar"));
@@ -1669,7 +1669,7 @@ public class CanonicalTests extends BaseTest{
 		
 		//Assert
 		assertEquals("Cannot rebase a branch with itself.", result[0]);
-		assertNull(result[1]);
+		assertEquals("",result[1]);
 	}
 	
 	@Test
@@ -1709,7 +1709,7 @@ public class CanonicalTests extends BaseTest{
 		//Assert
 		assertEquals("rebasing onto a future commit should only move the branch pointer", log1, gitlet("log"));
 		assertEquals("rebasing onto a future commit should only move the branch pointer", glog1, gitlet("global-log"));
-		assertNull(result3[1]);
+		assertEquals("",result3[1]);
 		assertEquals("file content doesn't match", "I never change", getText("eternal"));
 		assertEquals("file content doesn't match", "hawayu", getText("foo"));
 		assertEquals("file content doesn't match", "yo", getText("bar"));

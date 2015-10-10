@@ -17,7 +17,7 @@ public class InitCommandTests extends BaseTest{
 	
 	
     @Test
-    public void Execute_gitletFolderDoesNotExist_ReturnsTrue() {
+    public void execute_gitletFolderDoesNotExist_ReturnsTrue() {
     	
     	//Arrange
     	File f = new File(GITLET_DIR);
@@ -25,33 +25,33 @@ public class InitCommandTests extends BaseTest{
     	ICommand init = getInst();
     	
     	//Act
-    	boolean result = init.Execute();
+    	boolean result = init.execute();
     	
     	//Assert
     	assertTrue(result);
     }
     
     @Test
-    public void Execute_gitletFolderExists_ReturnsFalse() {
+    public void execute_gitletFolderExists_ReturnsFalse() {
     	
     	//Arrange
     	ICommand init = getInst();
     	
     	//Act
-    	boolean result = init.Execute();
+    	boolean result = init.execute();
     	
     	//Assert
     	assertTrue(result);
     }
     
     @Test
-    public void Execute_gitletFolderExists_CreatesGitletFolder() {
+    public void execute_gitletFolderExists_CreatesGitletFolder() {
     	
     	//Arrange
     	ICommand init = getInst();
     	
     	//Act
-    	init.Execute();
+    	init.execute();
     	
     	//Assert
     	File f = new File(GITLET_DIR + "objects/");
@@ -59,13 +59,13 @@ public class InitCommandTests extends BaseTest{
     }
     
     @Test
-    public void Execute_gitletFolderExists_CreatesObjectFolder() {
+    public void execute_gitletFolderExists_CreatesObjectFolder() {
     	
     	//Arrange
     	ICommand init = getInst();
     	
     	//Act
-    	init.Execute();
+    	init.execute();
     	
     	//Assert
     	File f = new File(GITLET_DIR + "objects/");

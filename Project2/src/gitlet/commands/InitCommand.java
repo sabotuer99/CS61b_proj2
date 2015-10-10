@@ -14,11 +14,27 @@ public class InitCommand implements ICommand {
 		
 	}
 	
-	public boolean Execute() {
+	public boolean execute() {
 		File f = new File(".gitlet/");
 		if(f.exists()){
 			return false;
 		} else {
+			
+			//get a reference to this directory, check if it's writable
+			//if it isn't writable, output error messages and return false
+			
+			//if it's writable, create the .gitlet folder
+			
+			//create the initial commit
+			
+			//create the master branch pointing at initial commit
+			//save master branch in .gitlet/refs/heads folder
+			
+			//create a new HEAD reference pointing at master branch
+			//save HEAD file to .gitlet/HEAD
+			
+			//save commit to the .gitlet/objects folder
+			
 			f = new File(".gitlet/objects/");
 			f.mkdirs();
 		
