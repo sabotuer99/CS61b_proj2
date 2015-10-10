@@ -1,6 +1,10 @@
 package gitlet.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,20 +83,33 @@ public class CanonicalTests extends BaseTest{
 	//This test case seems to dig a bit in to implementation details...
 	//TODO make this test case not dependent on implementation
 	@Test
-	public void init_doesNotModifyExistingRepo() throws IOException{
+	public void init_doesNotModifyExistingRepo() throws IOException, InterruptedException{
 		//Arrange
 		gitlet("init");
 		File f1 = createDirectory("expected");
 		File f2 = createDirectory("expected/foo");
 		File f3 = createFile("expected/world", "hello");
-
+		File f4 = createFile("expected/foo/blah", "blah blah blah");
+		gitlet("add", "expected/world");
+		gitlet("add", "expected/foo/blah");
+		gitlet("commit", "init test");
+		long lastModified = new File(System.getProperty("user.dir")).lastModified();
+		long repoModified = new File(".gitlet").lastModified();
+		Thread.sleep(1); //ensures that any changes have a different modified date
+		
 		//Act
 		gitlet("init");
 		
 		//Assert		
-		assertEquals(2, f1.list().length);
-		assertTrue(f3.exists());
+		assertEquals(2, f1.list().length);	
 		assertTrue(f2.exists());
+		assertTrue(f3.exists());
+		assertTrue(f4.exists());
+		assertEquals(lastModified, new File(System.getProperty("user.dir")).lastModified());
+		assertEquals(repoModified, new File(".gitlet").lastModified());
+		
+		//Clean Up
+		checkAndDelete("expected");
 	}
 	
 	@Test
@@ -870,4 +887,525 @@ public class CanonicalTests extends BaseTest{
 		assertEquals("A branch with that name already exists", result2[1]);
 	}
 	
+	@Test
+	public void checkout_branch_doNotTouchStagingArea(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		gitlet("rm", "foo");
+		createFile("bar", "Yahalo~");
+		gitlet("add", "bar");
+		gitlet("branch", "dev");
+		gitlet("checkout", "dev");
+		gitlet("commit", "world's cutting-edge greetings");
+		createFile("silence", "");
+		gitlet("rm", "bar");
+		gitlet("add", "silence");
+		String[] result1 = gitletErr("status");
+		String expected1 = 
+				"=== Branches ==="+
+				"*dev" +
+				"master"+
+				""+
+				"=== Staged Files ==="+
+				"silence"+
+				""+
+				"=== Files Marked for Removal ==="+
+				"bar";
+		
+		//Act
+		gitletErr("checkout", "master");
+		String[] result2 = gitletErr("status");
+		String expected2 = 
+				"=== Branches ==="+
+				"dev" +
+				"*master"+
+				""+
+				"=== Staged Files ==="+
+				"silence"+
+				""+
+				"=== Files Marked for Removal ==="+
+				"bar";
+		
+		gitlet("checkout", "dev");
+		String[] result3 = gitletErr("status");
+		
+		//Assert
+		assertNull(result1[1]);
+		assertNull(result2[1]);
+		assertNull(result3[1]);
+		assertEquals(expected1, result1[0]);
+		assertEquals(expected2, result2[0]);
+		assertEquals(expected1, result3[0]);
+	}
+	
+	@Test
+	public void checkout_file_doNotTouchStagingArea(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello");
+		createFile("bar", "Yahalo~");
+		gitlet("add", "bar");
+		gitlet("rm", "foo");
+		gitlet("checkout", comid1, "foo");
+		
+		String[] result1 = gitletErr("status");
+		String expected1 = 
+				"=== Branches ==="+
+				"master"+
+				""+
+				"=== Staged Files ==="+
+				"bar"+
+				""+
+				"=== Files Marked for Removal ==="+
+				"foo";
+		
+		//Act
+		gitletErr("checkout", "foo");
+		String[] result2 = gitletErr("status");
+		
+		//Assert
+		assertNull(result1[1]);
+		assertNull(result2[1]);
+		assertEquals(expected1, result1[0]);
+		assertEquals(expected1, result2[0]);
+	}
+	
+	@Test
+	public void checkout_branch_checkingOutCurrentBranch(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result1 = gitletErr("checkout", "master");
+		
+		//Assert
+		assertEquals("No need to checkout the current branch.", result1[0]);
+		assertEquals("No need to checkout the current branch.", result1[1]);
+	}
+	
+	@Test
+	public void checkout_branch_branchNotFound(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result1 = gitletErr("checkout", "future-version");
+		
+		//Assert
+		assertEquals("File does not exist in the most recent commit, or no such branch exists.", result1[0]);
+		assertEquals("No matching branch and no matching file in the current commit", result1[1]);
+	}
+	
+	@Test
+	public void checkout_file_commitNotFound(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result1 = gitletErr("checkout", "notavalidcommitid", "foo");
+		
+		//Assert
+		assertEquals("No commit with that id exists.", result1[0]);
+		assertEquals("Commit does not exist", result1[1]);
+	}
+	
+	@Test
+	public void checkout_file_fileNotFound(){
+		//Arrange
+		gitlet("init");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		
+		//Act
+		String[] result1 = gitletErr("checkout", "myFile");
+		String[] result2 = gitletErr("checkout", comid1, "myFile");
+		
+		//Assert
+		assertEquals("File does not exist in the most recent commit, or no such branch exists.", result1[0]);
+		assertEquals("No matching branch and no matching file in the current commit", result1[1]);
+		assertEquals("File does not exist in that commit.", result2[0]);
+		assertEquals("File does not exist in the specified commit", result2[1]);
+	}
+	
+	@Test
+	public void checkout_file_normalOperation(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello");
+		
+		File f = new File(System.getProperty("user.dir"));
+		int baselineFileCount = f.list().length;		
+		
+		//Act
+		//Assert
+		String[] result = gitletErr("checkout", comid1, "foo");
+		assertNull("Should be no output on Stdout", result[0]);
+		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		result = gitletErr("checkout", "foo");
+		assertNull("Should be no output on Stdout", result[0]);
+		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		gitlet("rm", "foo");
+		result = gitletErr("checkout", "foo");
+		assertNull("Should be no output on Stdout", result[0]);
+		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		gitlet("rm", "foo");
+		result = gitletErr("checkout", comid1, "foo");
+		assertNull("Should be no output on Stdout", result[0]);
+		assertNull("Should be no output on Stderr", result[1]);
+		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+	}
+	
+	@Test
+	public void commit_messageNotInOneArgument(){
+		//Arrange
+		createFile("foo", "");
+		gitlet("init");
+		gitlet("add", "foo");
+		String[] result1 = gitletErr("commit", "This is a sentence");
+		
+		//Act
+		String[] result2 = gitletErr("commit", "This","is","a","sentence");
+		
+		//Assert
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		assertEquals("Too many arguments", result2[0]);
+		assertEquals("Usage: java Gitlet commit MESSAGE", result2[1]);
+	}
+	
+	@Test
+	public void commit_emptyMessage(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "");
+		gitlet("add", "foo");
+		
+		//Act
+		String[] result = gitletErr("commit", "");
+		
+		//Assert
+		assertEquals("Please enter a commit message.", result[0]);
+		assertEquals("Please enter a non-empty commit message", result[1]);
+	}
+	
+	@Test
+	public void commit_specialMessage(){
+		//Arrange
+		createFile("1", "");
+		createFile("2", "");
+		createFile("3", "");
+		createFile("4", "");
+		createFile("5", "");
+		createFile("6", "");
+		gitlet("init");	
+				
+		//Act		
+		//Assert
+		gitlet("add", "1");
+		String[] result1 = gitletErr("commit", ".");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "2");
+		result1 = gitletErr("commit", "..");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "3");
+		result1 = gitletErr("commit", "/");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "4");
+		result1 = gitletErr("commit", "\\");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "5");
+		result1 = gitletErr("commit", "*");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "6");
+		result1 = gitletErr("commit", "~");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+	}
+	
+	@Test
+	public void commit_weirdMessage(){
+		//Arrange
+		createFile("1", "");
+		createFile("2", "");
+		createFile("3", "");
+		createFile("4", "");
+		createFile("5", "");
+		createFile("6", "");
+		createFile("7", "");
+		gitlet("init");	
+				
+		//Act		
+		//Assert
+		gitlet("add", "1");
+		String[] result1 = gitletErr("commit", "qwertyuiopasdfghjklzxcvbnm,QWERTYUIOPASDFGHJKLZXCVBNM,1234567890");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "2");
+		result1 = gitletErr("commit", "\\`~!@#$%^&*()_+-=[]\\{}|,./<>?:\";'\"'\"");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "3");
+		result1 = gitletErr("commit", "色は匂へえど いつか散りぬるを さ迷うことさえ 許せなかった");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "4");
+		result1 = gitletErr("commit", "≈₂ïç");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "5");
+		result1 = gitletErr("commit", "     ");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "6");
+		result1 = gitletErr("commit", "　");
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+		
+		gitlet("add", "7");
+		result1 = gitletErr("commit", "\n\r\t\f\'\"\\"); //eclipse wouldn't let me put the \a, \0, or \e in
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+	}
+	
+	@Test
+	public void commit_longMessage(){
+		//Arrange
+		createFile("foo", "");
+		gitlet("init");	
+		String message = "";
+		for(int i = 0; i < 2049; i++){
+			message += "x";
+		}
+		
+		//Act		
+		//Assert
+		gitlet("add", "foo");
+		String[] result1 = gitletErr("commit", message);
+		assertNull("Should be no output on Stdout", result1[0]);
+		assertNull("Should be no output on Stderr", result1[1]);
+	}
+	
+	@Test
+	public void reset_commitNotFound(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result1 = gitletErr("reset", "notavalidcommitid");
+		
+		//Assert
+		assertEquals("No commit with that id exists.", result1[0]);
+		assertEquals("Commit does not exist", result1[1]);
+	}
+	
+	@Test
+	public void reset_backAndForthOnAChain(){
+		gitlet("init");
+		String comid0 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello");
+		String comid2 = getLastCommitId(gitlet("log"));
+		createFile("extra", "");
+		File f = new File(System.getProperty("user.dir"));
+		int baselineFileCount = f.list().length;	
+		
+		//Act
+		//Assert
+		gitlet("reset", comid1);
+		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		gitlet("reset", comid2);
+		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		gitlet("reset", comid0);
+		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
+		
+		checkAndDelete("foo");
+		checkAndDelete("extra");
+		
+		gitlet("reset", comid1);
+		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount - 1, f.list().length);
+		checkAndDelete("foo");
+		
+		gitlet("reset", comid2);
+		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("extra file(s) detected", baselineFileCount - 1, f.list().length);
+		checkAndDelete("foo");
+		
+		gitlet("reset", comid0);
+		assertEquals("extra file(s) detected", baselineFileCount - 2, f.list().length);			
+	}
+	
+	@Test
+	public void find_noMatches(){
+		//Arrange
+		gitlet("init");
+		
+		//Act
+		String[] result = gitletErr("find", "haha");
+		
+		//Assert
+		assertEquals("Found no commit with that message", result[0]);
+		assertNull(result[1]);
+	}
+	
+	@Test
+	public void find_mustMatchWholeString(){
+		//Arrange
+		gitlet("init");
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "foo bar baz");
+		String comid1 = getLastCommitId(gitlet("log"));
+		
+		//Act
+		String[] result1 = gitletErr("find", "bar");
+		String[] result2 = gitletErr("find", "foo");
+		String[] result3 = gitletErr("find", "foo bar baz");
+		
+		//Assert
+		assertEquals("Found no commit with that message", result1[0]);
+		assertEquals("Found no commit with that message", result2[0]);
+		assertEquals("find 'foo bar baz' should list the 2nd commit", comid1, result3[0]);
+		assertNull(result1[1]);
+		assertNull(result2[1]);
+		assertNull(result3[1]);
+	}
+	
+	@Test
+	public void find_3differentMessages(){
+		//Arrange
+		gitlet("init");
+		String comid0 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello");
+		String comid2 = getLastCommitId(gitlet("log"));
+		
+		//Act
+		String[] result1 = gitletErr("find", "say hi");
+		String[] result2 = gitletErr("find", "say hello");
+		String[] result3 = gitletErr("find", "initial commit");
+		
+		//Assert
+		assertEquals("find 'say hi' should list the 2nd commit", comid1, result1[0]);
+		assertEquals("find 'say hello' should list the 3rd commit", comid2, result2[0]);
+		assertEquals("find 'initial commit' should list the ist commit", comid0, result3[0]);
+		assertNull(result1[1]);
+		assertNull(result2[1]);
+		assertNull(result3[1]);
+	}
+	
+	@Test
+	public void find_3sameMessages(){
+		//Arrange
+		gitlet("init");
+		String comid0 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "initial commit");
+		String comid1 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "initial commit");
+		String comid2 = getLastCommitId(gitlet("log"));
+		
+		//Act
+		String[] result3 = gitletErr("find", "initial commit");
+		
+		//Assert
+		assertTrue("all 3 commits should be listed", result3[0].contains(comid0));
+		assertTrue("all 3 commits should be listed", result3[0].contains(comid1));
+		assertTrue("all 3 commits should be listed", result3[0].contains(comid2));
+		assertNull(result3[1]);
+	}
+	
+	@Test
+	public void find_notAncestorsOrNotEvenReachable(){
+		//Arrange
+		gitlet("init"); //com0
+		String com0 = getLastCommitId(gitlet("log"));
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi"); //com1
+		//String com1 = getLastCommitId(gitlet("log"));
+		gitlet("branch", "dev");
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "initial commit"); //comL
+		String comL = getLastCommitId(gitlet("log"));
+		gitlet("checkout", "dev");
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "actually hello"); //comR
+		String comR = getLastCommitId(gitlet("log"));
+		gitlet("rm", "foo");
+		gitlet("commit", "initial commit");
+		String comOrphan = getLastCommitId(gitlet("log"));
+		gitlet("reset", comR);
+		
+		//Act
+		String[] result3 = gitletErr("find", "initial commit");
+		
+		//Assert
+		assertTrue("all 3 commits should be listed", result3[0].contains(com0));
+		assertTrue("all 3 commits should be listed", result3[0].contains(comL));
+		assertTrue("all 3 commits should be listed", result3[0].contains(comOrphan));
+		assertNull(result3[1]);
+	}
+
 }

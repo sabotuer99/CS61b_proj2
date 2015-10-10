@@ -63,7 +63,7 @@ public class BaseTest {
         }
     }
     
-	private void checkAndDelete(String name){
+	protected void checkAndDelete(String name){
 		File f = new File(name);
 		if(f.exists())
 			recursiveDelete(f);
