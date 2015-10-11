@@ -40,17 +40,18 @@ public class InitCommand implements ICommand {
 			
 			//if it's writable, create the .gitlet folder and subfolders
 			fileWriter.createDirectory(".gitlet/objects");
-			fileWriter.createDirectory(".gitlet/refs/heads");
-			
+			fileWriter.createDirectory(".gitlet/refs/heads");			
 			
 			//create the initial commit
 			Commit initialCommit = new Commit(new Commit(), System.currentTimeMillis(), "initial commit", null);
 			
 			//create the master branch pointing at initial commit
 			//save master branch in .gitlet/refs/heads folder
+			fileWriter.createFile(".gitlet/refs/heads/master", initialCommit.getId());
 			
 			//create a new HEAD reference pointing at master branch
 			//save HEAD file to .gitlet/HEAD
+			fileWriter.createFile(".gitlet/HEAD", "ref: .gitlet/refs/heads/master");
 			
 			//create .gitlet/objects/
 			//save commit to the .gitlet/objects folder

@@ -101,11 +101,14 @@ public class Commit implements Serializable {
 		if(!d.exists()){
 			d.mkdir();
 			try(
-			  OutputStream file = new FileOutputStream(filename);
+			  // to seperate this class from the filesyste, the call to 
+			  // FileOutputStream has to be replaced with something more
+		      // abstract...
+			  OutputStream file = new FileOutputStream(filename); 
 			  OutputStream buffer = new BufferedOutputStream(file);
 			  ObjectOutput output = new ObjectOutputStream(buffer);
 			){
-				System.out.println("Writing: " + this.id);
+				//System.out.println("Writing: " + this.id);
 				if(this.parent != null) {
 					output.writeObject(this.parent.getId());				
 				}
@@ -126,7 +129,7 @@ public class Commit implements Serializable {
 	
 	@SuppressWarnings("unchecked")
 	public static Commit readFromDisk(String id){
-		System.out.println("Reading: " + id);
+		//System.out.println("Reading: " + id);
 		
 		String objDir = ".gitlet/objects/" + id + "/";
 		File d = new File(objDir);

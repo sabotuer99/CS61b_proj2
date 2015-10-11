@@ -26,8 +26,8 @@ public class BaseTest {
 
     /* matches either unix/mac or windows line separators */
     protected static final String LINE_SEPARATOR = "\r\n|[\r\n]";
-
     
+    protected boolean stripWarning;  
     private List<String> createdFiles;
     /**
      * Deletes existing gitlet system, resets the folder that stores files used
@@ -49,11 +49,16 @@ public class BaseTest {
         f.mkdirs();
         
         createdFiles = new ArrayList<String>();
+        stripWarning = false;
     }
     
     @After
     public void tearDown() {
-        File f = new File(TESTING_DIR);
+        File f = new File(GITLET_DIR);
+        if (f.exists()) {
+            recursiveDelete(f);
+        }
+        f = new File(TESTING_DIR);
         if (f.exists()) {
             recursiveDelete(f);
         }
@@ -125,6 +130,12 @@ public class BaseTest {
         //return the string array, stripping out the newlines to make assertions simpler
         String stdout = printingResults.toString().replace("\n", "").replace("\r", "");
         String stderr = errorResults.toString().replace("\n", "").replace("\r", "");
+        
+        if(stripWarning){
+        	stdout = stdout.replace("Warning: The command you entered may alter the files "
+						+ "in your working directory. Uncommitted changes may be lost. "
+						+ "Are you sure you want to continue? (yes/no)", "");
+        }
         
         return new String[]{ stdout, stderr };
     }
