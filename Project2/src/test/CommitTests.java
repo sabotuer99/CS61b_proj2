@@ -43,31 +43,4 @@ public class CommitTests extends BaseTest{
 		assertNotEquals(sut1.getId(), sut2.getId());
 	}
 	
-	//this was moved to IFileWriter, test it there
-//	@Test
-//	public void save_TestDefaultObject(){
-//		new InitCommand().execute();
-//		Commit sut = new Commit();
-//		sut.save();
-//	}
-//	
-//	@Test
-//	public void readFromDisk_TestCommitRecovered(){
-//		new InitCommand().execute();
-//		Commit newCom = new Commit();
-//		
-//		HashMap<String, String> testMap = new HashMap<String, String>();
-//		testMap.put("test", "test value");
-//		Commit test = new Commit(newCom, 100L, "test commit", testMap);
-//		newCom.save();
-//		test.save();
-//		
-//		Commit sut = Commit.readFromDisk(test.getId());
-//		
-//		assertEquals("test commit", sut.getMessage());
-//		assertEquals(100L, sut.getTimeStamp().longValue());
-//		assertEquals(new Commit().getId(), sut.getParent().getId());
-//		assertEquals("test value", sut.getFilePointers().get("test"));
-//		
-//	}
 }

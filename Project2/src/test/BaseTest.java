@@ -183,7 +183,7 @@ public class BaseTest {
     	
         File f = new File(_name);
         if (!f.exists()) {
-                f.mkdir();
+                f.mkdirs();
         }
         
         return f;

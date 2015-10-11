@@ -89,7 +89,7 @@ public class FileSystemWriter implements IFileWriter {
 		
 		//if its the default object id, just return a new object;
 		if(id.equals(new Commit().getId()))
-			return null;
+			return new Commit();
 		
 		String objDir = ".gitlet/objects/" + id ;
 		File d = new File(objDir);
