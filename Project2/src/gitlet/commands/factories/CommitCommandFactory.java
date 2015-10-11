@@ -1,5 +1,6 @@
 package gitlet.commands.factories;
 
+import static org.junit.Assert.assertEquals;
 import gitlet.commands.CommitCommand;
 import gitlet.commands.ICommand;
 import gitlet.commands.NoOpCommand;
@@ -24,10 +25,15 @@ public class CommitCommandFactory implements ICommandFactory {
 		
 		if(args.length < 2){
 			System.out.println("Please enter a commit message.");
-			System.err.println("Need more arguments \n Usage: java Gitlet commit MESSAGE");
+			System.err.println("Need more arguments\nUsage: java Gitlet commit MESSAGE");
 			return new NoOpCommand();
 		}
 		
+		if(args.length > 2){
+			System.out.println("Too many arguments");
+			System.err.println("Usage: java Gitlet commit MESSAGE");
+			return new NoOpCommand();
+		}		
 		
 		return new CommitCommand(args[1]);
 	}

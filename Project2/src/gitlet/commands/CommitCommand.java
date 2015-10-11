@@ -1,5 +1,6 @@
 package gitlet.commands;
 
+import static org.junit.Assert.assertEquals;
 import gitlet.Commit;
 import gitlet.FileSystemWriter;
 import gitlet.IFileWriter;
@@ -27,6 +28,14 @@ public class CommitCommand implements ICommand {
 	@Override
 	public boolean execute() {
 		// TODO Auto-generated method stub
+		//if commit message is empty, print error message and return false
+		if("".equals(message)){
+			System.out.println("Please enter a commit message.");
+			System.err.println("Please enter a non-empty commit message");
+			return false;
+		}
+		
+		
 		//recover current commit
 		String currentCommitId = fileWriter.getCurrentHeadPointer();
 		Commit currentHead = fileWriter.recoverCommit(currentCommitId);
@@ -34,6 +43,13 @@ public class CommitCommand implements ICommand {
 		//get Staging 
 		Staging staging = fileWriter.recoverStaging();
 		
+		//if stagins is empty, print error message and return false
+		if(staging.getFilesToRm().size() == 0 && staging.getFilesToAdd().size() == 0 ){
+			System.out.println("No changes added to the commit.");
+			System.err.println("No changes added to the commit.");
+			return false;
+		}
+			
 		//get current filePointers
 		HashMap<String, String> filePointers = currentHead.getFilePointers() == null ? 
 				new HashMap<String, String>() : currentHead.getFilePointers();

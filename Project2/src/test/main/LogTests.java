@@ -14,8 +14,18 @@ import test.BaseTest;
 public class LogTests extends BaseTest {
 
 	@Test
+	public void log_initialCommit(){
+		this.stripNewLines = false;
+		gitlet("init");
+		String[] result = gitletErr("log");
+		System.out.println(result[0]);
+	}
+	
+	
+	@Test
 	public void log_formatCheck(){
 		//Arrange
+		this.stripNewLines = false;
 		createFile("aaa", "123");
 		createFile("bbb", "456");
 		createFile("ccc", "789");
@@ -43,6 +53,7 @@ public class LogTests extends BaseTest {
 	@Test
 	public void log_orderCheck(){
 		//Arrange
+		this.stripNewLines = false;
 		createFile("aaa", "123");
 		createFile("bbb", "456");
 		createFile("ccc", "789");
@@ -117,20 +128,21 @@ public class LogTests extends BaseTest {
 		gitlet("commit", "wow");
 		
 		//Act
+		this.stripNewLines = false;
 		String[] result1 = gitletErr("log");
 		gitlet("checkout", "master");
 		String[] result2 = gitletErr("log");
 		
 		//Assert
 		assertEquals("",result1[1]);
-		assertEquals("haha log should output exactly 3 commits", 3, extractCommitMessages(result1[0]));		
+		assertEquals("haha log should output exactly 3 commits", 3, extractCommitMessages(result1[0]).length);		
 		assertFalse("haha log output should not contain the 'more' commit", result1[0].contains("more"));
 		assertTrue("haha log output should contain the 'wow' commit", result1[0].contains("wow"));
 		assertTrue("haha log output should contain the '1st' commit", result1[0].contains("1st"));
 		assertTrue("haha log output should contain the initial commit", result1[0].contains("initial commit"));
 		
 		assertEquals("",result2[1]);
-		assertEquals("master log should output exactly 3 commits", 3, extractCommitMessages(result2[0]));
+		assertEquals("master log should output exactly 3 commits", 3, extractCommitMessages(result2[0]).length);
 		assertTrue("master log output should contain the 'more' commit", result2[0].contains("more"));
 		assertFalse("master log output should not contain the 'wow' commit", result2[0].contains("wow"));
 		assertTrue("master log output should contain the '1st' commit", result2[0].contains("1st"));

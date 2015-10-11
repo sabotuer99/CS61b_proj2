@@ -38,8 +38,8 @@ public class Commit implements Serializable {
 			}
 			
 			text =  filePointersText 
-					+ this.message
-					+ this.timeStamp.toString()
+					+ message
+					+ timeStamp.toString()
 					+ Integer.toString(parent.hashCode());
 		}
 		

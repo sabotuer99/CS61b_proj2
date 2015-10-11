@@ -147,10 +147,10 @@ public class CommitTests extends BaseTest {
 		String[] result4 = gitletErr("commit", "ddd");
 		
 		//Assert
-		assertTrue("Should be no output on Stdout", result1[0] == null && result2[0] == null 
-				&& result3[0] == null && result4[0] == null);
-		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null 
-				&& result3[1] == null && result4[1] == null);
+		assertTrue("Should be no output on Stdout", result1[0].equals("") && result2[0].equals("") 
+				&& result3[0].equals("") && result4[0].equals(""));
+		assertTrue("Should be no output on Stderr", result1[1].equals("") && result2[1].equals("") 
+				&& result3[1].equals("") && result4[1].equals(""));
 	}
 
 	@Test
@@ -167,8 +167,8 @@ public class CommitTests extends BaseTest {
 		gitlet("add", "polite");
 		
 		String[] result = gitletErr("commit", "Greetings!"); 		
-		assertTrue("Should be no output on Stdout", result[0] == null);
-		assertTrue("Should be no output on Stderr", result[1] == null);
+		assertTrue("Should be no output on Stdout", result[0].equals(""));
+		assertTrue("Should be no output on Stderr", result[1].equals(""));
 		
 		recursiveDelete(new File("casual"));
 		recursiveDelete(new File("polite"));
@@ -185,8 +185,8 @@ public class CommitTests extends BaseTest {
 		createFile("weird", "Selama Pagi");
 		gitlet("add", "weird");
 		result = gitletErr("commit", "something from Nichijou"); 		
-		assertTrue("Should be no output on Stdout", result[0] == null);
-		assertTrue("Should be no output on Stderr", result[1] == null);
+		assertTrue("Should be no output on Stdout", result[0].equals(""));
+		assertTrue("Should be no output on Stderr", result[1].equals(""));
 		//
 		// 2nd check - master
 		//
@@ -239,8 +239,8 @@ public class CommitTests extends BaseTest {
 		String[] result3 = gitletErr("commit", "longer foo");
 		
 		//Assert
-		assertTrue("Should be no output on Stdout", result1[0] == null && result2[0] == null && result3[0] == null);
-		assertTrue("Should be no output on Stderr", result1[1] == null && result2[1] == null && result3[1] == null);
+		assertTrue("Should be no output on Stdout", result1[0].equals("") && result2[0].equals("") && result3[0].equals(""));
+		assertTrue("Should be no output on Stderr", result1[1].equals("") && result2[1].equals("") && result3[1].equals(""));
 	}
 
 	@Test

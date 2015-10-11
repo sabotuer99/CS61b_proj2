@@ -4,6 +4,10 @@ import gitlet.Commit;
 import gitlet.FileSystemWriter;
 import gitlet.IFileWriter;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class LogCommand implements ICommand {
 
 	private IFileWriter fileWriter;
@@ -28,12 +32,19 @@ public class LogCommand implements ICommand {
 		while(head != null){
 			System.out.println("====");
 			System.out.println("Commit " + head.getId());		
-			String date = String.format("YYYY-mm-dd HH-MM-SS", head.getTimeStamp());			
+			String date = convertTime(head.getTimeStamp());			
 			System.out.println(date);
 			System.out.println(head.getMessage());	
+			System.out.println();
+			head = head.getParent();
 		}
 		
 		return true;
 	}
 
+	private String convertTime(long time){
+	    Date date = new Date(time);
+	    Format format = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+	    return format.format(date);
+	}
 }

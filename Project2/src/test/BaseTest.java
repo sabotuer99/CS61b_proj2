@@ -27,7 +27,8 @@ public class BaseTest {
     /* matches either unix/mac or windows line separators */
     protected static final String LINE_SEPARATOR = "\r\n|[\r\n]";
     
-    protected boolean stripWarning;  
+    protected boolean stripWarning;
+    protected boolean stripNewLines = true;  
     private List<String> createdFiles;
     /**
      * Deletes existing gitlet system, resets the folder that stores files used
@@ -50,6 +51,7 @@ public class BaseTest {
         
         createdFiles = new ArrayList<String>();
         stripWarning = false;
+        stripNewLines = true;
     }
     
     @After
@@ -128,8 +130,13 @@ public class BaseTest {
         }
         
         //return the string array, stripping out the newlines to make assertions simpler
-        String stdout = printingResults.toString().replace("\n", "").replace("\r", "");
-        String stderr = errorResults.toString().replace("\n", "").replace("\r", "");
+        String stdout = printingResults.toString();
+        String stderr = errorResults.toString();
+        
+        if(stripNewLines){
+        	stdout = stdout.replace("\n", "").replace("\r", "");
+            stderr = stderr.replace("\n", "").replace("\r", "");
+        }
         
         if(stripWarning){
         	stdout = stdout.replace("Warning: The command you entered may alter the files "
