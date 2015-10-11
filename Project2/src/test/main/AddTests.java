@@ -56,13 +56,13 @@ public class AddTests extends BaseTest{
 		//Act
 		String result = gitlet("status");
 		String expected = 
-				": === Branches ==="+
-				": *master"+
-				":"+
-				": === Staged Files ==="+
-				": diary"+
-				":"+
-				": === Files Marked for Removal ===";
+				"=== Branches ==="+
+				"*master"+
+				""+
+				"=== Staged Files ==="+
+				"diary"+
+				""+
+				"=== Files Marked for Removal ===";
 		
 		//Assert
 		assertEquals(expected, result);

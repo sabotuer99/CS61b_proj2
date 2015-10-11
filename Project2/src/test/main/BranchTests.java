@@ -72,7 +72,6 @@ public class BranchTests extends BaseTest{
 		gitlet("add", "bar");
 		
 		//Act
-		gitlet("branch", "z");	
 		String result1 = gitlet("status");
 		String expected1 = 
 				"=== Branches ==="+
