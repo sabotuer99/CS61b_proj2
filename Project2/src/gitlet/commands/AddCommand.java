@@ -65,4 +65,12 @@ public class AddCommand implements ICommand {
 		}
 	}
 
+	public IFileWriter getFileWriter() {
+		return fileWriter;
+	}
+
+	public void setFileWriter(IFileWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
+
 }

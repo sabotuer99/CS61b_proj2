@@ -58,6 +58,7 @@ public class Gitlet {
 		commands.add(new InitCommandFactory());
 		commands.add(new AddCommandFactory());
 		commands.add(new RmCommandFactory());
+		commands.add(new StatusCommandFactory());
 		
 		return commands;
 	}
