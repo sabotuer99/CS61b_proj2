@@ -1,4 +1,4 @@
-package gitlet.test.main.canonical;
+package test.main;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import gitlet.test.BaseTest;
+import test.BaseTest;
 
 public class RmTests extends BaseTest{
 

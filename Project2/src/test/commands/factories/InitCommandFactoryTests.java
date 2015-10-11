@@ -1,4 +1,4 @@
-package gitlet.test.commands.factories;
+package test.commands.factories;
 
 import static org.junit.Assert.*;
 import gitlet.commands.ICommand;

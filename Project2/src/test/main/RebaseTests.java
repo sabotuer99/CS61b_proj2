@@ -1,4 +1,4 @@
-package gitlet.test.main.canonical;
+package test.main;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,17 +6,17 @@ import java.io.File;
 
 import org.junit.Test;
 
-import gitlet.test.BaseTest;
+import test.BaseTest;
 
-public class IrebaseTests extends BaseTest {
+public class RebaseTests extends BaseTest {
 
 	@Test
-	public void irebase_branchNotFound(){
+	public void rebase_branchNotFound(){
 		//Arrange
 		gitlet("init");
 		
 		//Act
-		String[] result = gitletErr("i-rebase", "mysterious");
+		String[] result = gitletErr("rebase", "mysterious");
 		
 		//Assert
 		assertEquals("A branch with that name does not exist.", result[0]);
@@ -24,7 +24,7 @@ public class IrebaseTests extends BaseTest {
 	}
 
 	@Test
-	public void irebase_ontoFuture(){
+	public void rebase_ontoFuture(){
 		//Arrange
 		gitlet("init"); //com0
 		File f = new File(System.getProperty("user.dir"));
@@ -55,7 +55,7 @@ public class IrebaseTests extends BaseTest {
 		checkAndDelete("baz");
 		
 		//Act
-		String[] result3 = gitletErr("i-rebase", "master");
+		String[] result3 = gitletErr("rebase", "master");
 		
 		//Assert
 		assertEquals("rebasing onto a future commit should only move the branch pointer", log1, gitlet("log"));
@@ -73,7 +73,7 @@ public class IrebaseTests extends BaseTest {
 	}
 
 	@Test
-	public void irebase_ontoPast(){
+	public void rebase_ontoPast(){
 		//Arrange
 		gitlet("init"); //com0
 		createFile("foo", "hi");
@@ -94,7 +94,7 @@ public class IrebaseTests extends BaseTest {
 		gitlet("commit", "good morning");
 		
 		//Act
-		String[] result3 = gitletErr("i-rebase", "dev");
+		String[] result3 = gitletErr("rebase", "dev");
 		
 		//Assert
 		assertEquals("Already up-to-date.", result3[0]);
@@ -102,12 +102,12 @@ public class IrebaseTests extends BaseTest {
 	}
 
 	@Test
-	public void irebase_ontoSelf(){
+	public void rebase_ontoSelf(){
 		//Arrange
 		gitlet("init");
 		
 		//Act
-		String[] result = gitletErr("i-rebase", "master");
+		String[] result = gitletErr("merge", "master");
 		
 		//Assert
 		assertEquals("Cannot rebase a branch with itself.", result[0]);

@@ -1,13 +1,14 @@
-package gitlet.test.commands;
+package test.commands;
 
 import static org.junit.Assert.assertTrue;
 import gitlet.commands.ICommand;
 import gitlet.commands.InitCommand;
-import gitlet.test.BaseTest;
 
 import java.io.File;
 
 import org.junit.Test;
+
+import test.BaseTest;
 
 public class InitCommandTests extends BaseTest{
 	

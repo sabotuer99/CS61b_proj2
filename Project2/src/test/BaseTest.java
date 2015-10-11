@@ -1,4 +1,4 @@
-package gitlet.test;
+package test;
 
 import gitlet.Gitlet;
 

@@ -1,13 +1,14 @@
-package gitlet.test.main.canonical;
+package test.main;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import gitlet.test.BaseTest;
 
 import java.io.File;
 
 import org.junit.Test;
+
+import test.BaseTest;
 
 /**
  * Class that provides JUnit tests for Gitlet, as well as a couple of utility

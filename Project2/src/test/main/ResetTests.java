@@ -1,4 +1,4 @@
-package gitlet.test.main.canonical;
+package test.main;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,7 +6,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-import gitlet.test.BaseTest;
+import test.BaseTest;
 
 public class ResetTests extends BaseTest {
 

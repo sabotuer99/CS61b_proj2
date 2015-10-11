@@ -1,4 +1,4 @@
-package gitlet.test;
+package test;
 
 import static org.junit.Assert.*;
 

@@ -1,11 +1,12 @@
-package gitlet.test.main.canonical;
+package test.main;
 
 import static org.junit.Assert.assertEquals;
-import gitlet.test.BaseTest;
 
 import java.io.IOException;
 
 import org.junit.Test;
+
+import test.BaseTest;
 
 public class AddTests extends BaseTest{
 
