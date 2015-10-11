@@ -2,6 +2,10 @@ package gitlet.commands;
 
 public class ResetCommand implements ICommand {
 
+	public ResetCommand(String[] args) {
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public boolean isDangerous() {
 		// TODO Auto-generated method stub

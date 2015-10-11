@@ -1,9 +1,17 @@
 package gitlet.commands;
 
 import gitlet.Commit;
-import gitlet.Gitlet;
+import gitlet.FileSystemWriter;
+import gitlet.IFileWriter;
 
 public class LogCommand implements ICommand {
+
+	private IFileWriter fileWriter;
+
+	
+	public LogCommand() {
+		this.fileWriter = new FileSystemWriter();
+	}
 
 	@Override
 	public boolean isDangerous() {
@@ -14,8 +22,8 @@ public class LogCommand implements ICommand {
 	@Override
 	public boolean execute() {
 		// TODO Auto-generated method stub
-		String id = Gitlet.getCurrentHeadPointer();
-		Commit head = Commit.readFromDisk(id);
+		String id = fileWriter.getCurrentHeadPointer();
+		Commit head = fileWriter.recoverCommit(id);
 		
 		while(head != null){
 			System.out.println("====");

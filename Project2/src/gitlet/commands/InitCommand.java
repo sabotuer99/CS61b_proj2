@@ -55,7 +55,7 @@ public class InitCommand implements ICommand {
 			
 			//create .gitlet/objects/
 			//save commit to the .gitlet/objects folder
-			initialCommit.save();
+			fileWriter.saveCommit(initialCommit);
 
 			return true;
 		}

@@ -6,4 +6,9 @@ public interface IFileWriter {
 	boolean exists(String name);
 	boolean canWrite(String name);
 	boolean isDirectory(String name);
+	void saveCommit(Commit commit);
+	Commit recoverCommit(String id);
+	String getWorkingDirectory();
+	String getCurrentBranchRef();
+	String getCurrentHeadPointer();
 }

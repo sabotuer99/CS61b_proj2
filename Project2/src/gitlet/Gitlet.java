@@ -5,10 +5,6 @@ import gitlet.commands.ICommand;
 import gitlet.commands.factories.ICommandFactory;
 import gitlet.commands.factories.InitCommandFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -64,27 +60,5 @@ public class Gitlet {
 		
 		return commands;
 	}
-	
-	
-	public static String getWorkingDirectory(){
-		return System.getProperty("user.dir");
-	}
-	
-	public static String getCurrentHeadPointer(){
-		return getText(getCurrentBranchRef()); 
-	}
-	
-	public static String getCurrentBranchRef(){
-		return getText(".gitlet/HEAD").replace("refs: ", "");
-	}
-	
-    private static String getText(String fileName) {
-        try {
-            byte[] encoded = Files.readAllBytes(Paths.get(fileName));
-            return new String(encoded, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return "";
-        }
-    }
 	
 }
