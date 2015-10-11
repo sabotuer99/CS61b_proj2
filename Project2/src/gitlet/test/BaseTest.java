@@ -249,4 +249,13 @@ public class BaseTest {
         	return "";
         } 
 	}
+	
+	protected String emptyStatus = 
+			"=== Branches ==="+
+			"*master"+
+			""+
+			"=== Staged Files ==="+
+			""+
+			"=== Files Marked for Removal ===";
+
 }

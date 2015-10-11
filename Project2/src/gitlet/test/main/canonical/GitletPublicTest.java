@@ -1,4 +1,4 @@
-package gitlet.test.main;
+package gitlet.test.main.canonical;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
