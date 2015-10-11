@@ -7,6 +7,7 @@ import gitlet.commands.factories.InitCommandFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Gitlet {
 
@@ -33,7 +34,21 @@ public class Gitlet {
 		if(null == command){
 			System.err.println("Unknown command: " + args[0]);
 		} else {
-			command.execute();
+			boolean canExecute = true;
+			
+			if(command.isDangerous()){
+				System.out.println("Warning: The command you entered may alter the files "
+						+ "in your working directory. Uncommitted changes may be lost. "
+						+ "Are you sure you want to continue? (yes/no)");
+				Scanner stdin = new Scanner(System.in);
+				String answer = stdin.nextLine();
+				if(!"yes".equals(answer))
+					canExecute = false;
+				stdin.close();
+			}
+			
+			if(canExecute)
+				command.execute();
 		}
 		
 	}

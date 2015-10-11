@@ -1,29 +1,28 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.Commit;
-
-import java.io.File;
-import java.security.MessageDigest;
-
-import org.junit.Test;
+import gitlet.FileSystemWriter;
+import gitlet.IFileWriter;
 
 
 public class InitCommand implements ICommand {
 
 	//private String workingDir;
+	private IFileWriter fileWriter;
+	private String userDir;
 	
 	public InitCommand(){
-		
-	}
+		//these could be injected if I wanted to...
+		fileWriter = new FileSystemWriter();
+		userDir = System.getProperty("user.dir");
+	}	
 	
 	public boolean execute() {
-		File f = new File(".gitlet");
-		if(f.exists()){
+		if(fileWriter.exists(".gitlet")){
 			
 			System.out.println("A gitlet version control system already exists in the current directory.");
 			
-			if(f.isDirectory()){
+			if(fileWriter.isDirectory(".gitlet")){
 				System.err.println("A Gitlet repo already exists");
 			} else {
 				System.err.println(".gitlet already exists but it is not a directory");
@@ -34,16 +33,15 @@ public class InitCommand implements ICommand {
 			
 			//get a reference to this directory, check if it's writable
 			//if it isn't writable, output error messages and return false
-			File thisFolder = new File(System.getProperty("user.dir"));
-			if(!thisFolder.canWrite()){
+			if(!fileWriter.canWrite(userDir)){
 				System.err.println("IO ERROR: Failed to create directory: .gitlet");
 					return false;
 			}		
 			
 			//if it's writable, create the .gitlet folder and subfolders
-			f.mkdirs();
-			new File(".gitlet/objects").mkdir();
-			new File(".gitlet/refs/heads").mkdir();
+			fileWriter.createDirectory(".gitlet/objects");
+			fileWriter.createDirectory(".gitlet/refs/heads");
+			
 			
 			//create the initial commit
 			Commit initialCommit = new Commit(new Commit(), System.currentTimeMillis(), "initial commit", null);
@@ -60,6 +58,12 @@ public class InitCommand implements ICommand {
 
 			return true;
 		}
+	}
+
+
+	@Override
+	public boolean isDangerous() {
+		return false;
 	}
 
 }

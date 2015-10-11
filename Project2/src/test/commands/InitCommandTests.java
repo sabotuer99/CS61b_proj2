@@ -46,7 +46,7 @@ public class InitCommandTests extends BaseTest{
     }
     
     @Test
-    public void execute_gitletFolderExists_CreatesGitletFolder() {
+    public void execute_CreatesGitletFolder() {
     	
     	//Arrange
     	ICommand init = getInst();
@@ -60,7 +60,7 @@ public class InitCommandTests extends BaseTest{
     }
     
     @Test
-    public void execute_gitletFolderExists_CreatesObjectFolder() {
+    public void execute_CreatesObjectFolder() {
     	
     	//Arrange
     	ICommand init = getInst();
@@ -73,8 +73,20 @@ public class InitCommandTests extends BaseTest{
     	assertTrue("Object folder not found", f.exists());
     }
     
-  /* @Override 
-    public void tearDown(){
+    @Test
+    public void execute_CreatesRefsFolder() {
     	
-    }*/
+    	//Arrange
+    	ICommand init = getInst();
+    	
+    	//Act
+    	init.execute();
+    	
+    	//Assert
+    	File f = new File(GITLET_DIR + "refs/");
+    	assertTrue("Refs folder not found", f.exists());
+    }
+    
+    
+
 }
