@@ -20,7 +20,7 @@ public class AddCommandFactory implements ICommandFactory {
 	@Override
 	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return new AddCommand(args);
+		return new AddCommand(args[1]);
 	}
 
 }

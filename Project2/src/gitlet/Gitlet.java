@@ -2,8 +2,7 @@ package gitlet;
 
 import gitlet.commands.CommandParser;
 import gitlet.commands.ICommand;
-import gitlet.commands.factories.ICommandFactory;
-import gitlet.commands.factories.InitCommandFactory;
+import gitlet.commands.factories.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +56,8 @@ public class Gitlet {
 		List<ICommandFactory> commands = new ArrayList<ICommandFactory>();
 		
 		commands.add(new InitCommandFactory());
+		commands.add(new AddCommandFactory());
+		commands.add(new RmCommandFactory());
 		
 		return commands;
 	}

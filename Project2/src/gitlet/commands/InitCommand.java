@@ -3,6 +3,7 @@ package gitlet.commands;
 import gitlet.Commit;
 import gitlet.FileSystemWriter;
 import gitlet.IFileWriter;
+import gitlet.Staging;
 
 
 public class InitCommand implements ICommand {
@@ -53,9 +54,12 @@ public class InitCommand implements ICommand {
 			//save HEAD file to .gitlet/HEAD
 			fileWriter.createFile(".gitlet/HEAD", "ref: .gitlet/refs/heads/master");
 			
-			//create .gitlet/objects/
+			
 			//save commit to the .gitlet/objects folder
 			fileWriter.saveCommit(initialCommit);
+			
+			//save new staging area
+			fileWriter.saveStaging(new Staging());
 
 			return true;
 		}

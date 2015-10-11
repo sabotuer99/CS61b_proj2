@@ -1,5 +1,6 @@
 package gitlet;
 
+
 public interface IFileWriter {
 	void createFile(String fileName, String fileText);
 	void createDirectory(String dirName);
@@ -11,4 +12,8 @@ public interface IFileWriter {
 	String getWorkingDirectory();
 	String getCurrentBranchRef();
 	String getCurrentHeadPointer();
+	Staging recoverStaging();
+	void saveStaging(Staging staging);
+	String[] getAllBranches();
+	long lastModified(String name);
 }

@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,13 +87,18 @@ public class FileSystemWriter implements IFileWriter {
 	public Commit recoverCommit(String id){
 		//System.out.println("Reading: " + id);
 		
-		String objDir = ".gitlet/objects/" + id + "/";
+		//if its the default object id, just return a new object;
+		if(id.equals(new Commit().getId()))
+			return null;
+		
+		String objDir = ".gitlet/objects/" + id ;
 		File d = new File(objDir);
 		if(!d.exists()){
 			throw new IllegalArgumentException("Gitlet not initialized!");
+			//return null;
 		}
 			
-		String filename = objDir + id;
+		String filename = objDir + "/" + id;
 		Commit recovered = null;
 		Commit parent = null;
 		Long timeStamp;
@@ -170,7 +176,7 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	public String getCurrentBranchRef(){
-		return getText(".gitlet/HEAD").replace("refs: ", "");
+		return getText(".gitlet/HEAD").replace("ref: ", "");
 	}
 
 	@Override
@@ -194,5 +200,80 @@ public class FileSystemWriter implements IFileWriter {
 	
 	private static final Logger fLogger =
 		    Logger.getLogger(Commit.class.getPackage().getName());
+
+	@Override
+	public void saveStaging(Staging staging) {
+		String filename = ".gitlet/objects/staging";
+
+		try(
+		  OutputStream file = new FileOutputStream(filename); 
+		  OutputStream buffer = new BufferedOutputStream(file);
+		  ObjectOutput output = new ObjectOutputStream(buffer);
+		){
+			output.writeObject(staging.getFilesToAdd());		
+			output.writeObject(staging.getFilesToRm());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Staging recoverStaging() {
+		
+//		String objDir = ".gitlet/objects/staging";
+//		File d = new File(objDir);
+//		if(!d.exists()){
+//			throw new IllegalArgumentException("Gitlet not initialized!");
+//		}
+			
+		String filename = ".gitlet/objects/staging";
+		Staging recovered = null;
+		
+		File f = new File(filename);
+		if(f.exists()){
+			try(
+		      InputStream file = new FileInputStream(filename);
+		      InputStream buffer = new BufferedInputStream(file);
+		      ObjectInput input = new ObjectInputStream (buffer);
+		    ){
+		      
+		      List<String> filesToAdd = (List<String>)input.readObject();
+		      List<String> filesToRm = (List<String>)input.readObject();
+		      
+		      recovered = new Staging();
+		      recovered.setFilesToAdd(filesToAdd);
+		      recovered.setFilesToRm(filesToRm);
+		    }
+		    catch(ClassNotFoundException ex){
+		      fLogger.log(Level.SEVERE, "Cannot perform input. Class not found.", ex);
+		      
+		    }
+		    catch(IOException ex){
+		      fLogger.log(Level.SEVERE, "Cannot perform input.", ex);
+		    }
+			
+			return recovered;
+			
+		} else {
+			System.out.println("Staging object not found!");
+			return null;
+		}
+	}
+
+	@Override
+	public String[] getAllBranches() {
+		// TODO Auto-generated method stub
+		return new File(".gitlet/refs/heads").list();
+	}
+
+	@Override
+	public long lastModified(String name) {
+		// TODO Auto-generated method stub
+		return new File(name).lastModified();
+	}
+
+
 
 }
