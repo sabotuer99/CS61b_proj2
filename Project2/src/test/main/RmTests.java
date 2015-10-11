@@ -1,7 +1,6 @@
 package test.main;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +39,10 @@ public class RmTests extends BaseTest{
 		
 		//Assert
 		//no output on Stdout or Stderr...
-		assertTrue(result1[0] == null && result1[1] == null && result2[0] == null && result2[1] == null);
+		assertEquals("", result1[0]);
+		assertEquals("", result1[1]);
+		assertEquals("", result2[0]);
+		assertEquals("", result2[1]);
 	}
 
 	@Test

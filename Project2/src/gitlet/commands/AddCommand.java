@@ -1,5 +1,6 @@
 package gitlet.commands;
 
+import static org.junit.Assert.assertEquals;
 import gitlet.FileSystemWriter;
 import gitlet.IFileWriter;
 import gitlet.Staging;
@@ -23,6 +24,14 @@ public class AddCommand implements ICommand {
 
 	@Override
 	public boolean execute() {
+		
+		//if the file doesn't exists, print error message and 
+		//return false
+		if(!fileWriter.exists(fileToAdd)){
+			System.out.println("File does not exist.");
+			System.err.println("File does not exist: " + fileToAdd);
+			return false;
+		}
 		
 		//get the current staging area
 		Staging staging = fileWriter.recoverStaging();

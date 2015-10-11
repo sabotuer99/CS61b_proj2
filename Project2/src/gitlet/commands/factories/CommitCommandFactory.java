@@ -2,6 +2,7 @@ package gitlet.commands.factories;
 
 import gitlet.commands.CommitCommand;
 import gitlet.commands.ICommand;
+import gitlet.commands.NoOpCommand;
 
 public class CommitCommandFactory implements ICommandFactory {
 
@@ -20,7 +21,15 @@ public class CommitCommandFactory implements ICommandFactory {
 	@Override
 	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return new CommitCommand(args);
+		
+		if(args.length < 2){
+			System.out.println("Please enter a commit message.");
+			System.err.println("Need more arguments \n Usage: java Gitlet commit MESSAGE");
+			return new NoOpCommand();
+		}
+		
+		
+		return new CommitCommand(args[1]);
 	}
 
 }

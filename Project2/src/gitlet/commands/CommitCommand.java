@@ -1,9 +1,21 @@
 package gitlet.commands;
 
+import gitlet.Commit;
+import gitlet.FileSystemWriter;
+import gitlet.IFileWriter;
+import gitlet.Staging;
+
+import java.util.HashMap;
+
 public class CommitCommand implements ICommand {
 
-	public CommitCommand(String[] args) {
+	private String message;
+	private IFileWriter fileWriter;
+
+	public CommitCommand(String message) {
 		// TODO Auto-generated constructor stub
+		this.message = message;
+		this.fileWriter = new FileSystemWriter();
 	}
 
 	@Override
@@ -15,7 +27,54 @@ public class CommitCommand implements ICommand {
 	@Override
 	public boolean execute() {
 		// TODO Auto-generated method stub
-		return false;
+		//recover current commit
+		String currentCommitId = fileWriter.getCurrentHeadPointer();
+		Commit currentHead = fileWriter.recoverCommit(currentCommitId);
+		
+		//get Staging 
+		Staging staging = fileWriter.recoverStaging();
+		
+		//get current filePointers
+		HashMap<String, String> filePointers = currentHead.getFilePointers() == null ? 
+				new HashMap<String, String>() : currentHead.getFilePointers();
+		
+		
+		//create new commit with parent filePointers and 
+		//current systime for timestamp
+		Commit newCommit = new Commit(currentHead, System.currentTimeMillis(), message, filePointers);
+		String id = newCommit.getId();
+		
+		//create commit folder
+		String objectsFolder = ".gitlet/objects/" + id;
+		fileWriter.createDirectory(objectsFolder);
+		
+		//add or update the filePointers from 
+		//staging.filesToAdd
+		//and make a copy of files to commit folder
+		if(staging.getFilesToAdd().size() > 0)
+		for(String fileToAdd : staging.getFilesToAdd()){
+			newCommit.getFilePointers().put(fileToAdd, id);
+			fileWriter.copyFile(fileToAdd, objectsFolder + "/" + fileToAdd);
+		}
+		
+		//remove files from filePointers from
+		//staging.fileToRm
+		if(staging.getFilesToRm().size() > 0)
+		for(String fileToRm : staging.getFilesToRm()){
+			newCommit.getFilePointers().remove(fileToRm);
+		}
+		
+		//save new Commit object
+		fileWriter.saveCommit(newCommit);
+		
+		//update reference in current branch to 
+		//new commit id
+		fileWriter.createFile(fileWriter.getCurrentBranchRef(), newCommit.getId());
+		
+		//reset and save staging area
+		fileWriter.saveStaging(new Staging());
+		
+		return true;
 	}
 
 }

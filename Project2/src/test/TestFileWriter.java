@@ -94,4 +94,10 @@ public class TestFileWriter implements IFileWriter {
 		return null;
 	}
 
+	@Override
+	public void copyFile(String filePath, String destPath) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

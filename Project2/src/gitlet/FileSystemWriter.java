@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,44 +26,44 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	public void createFile(String fileName, String fileText) {
-        File f = new File(fileName);
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        writeFile(fileName, fileText);
+		File f = new File(fileName);
+		if (!f.exists()) {
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		writeFile(fileName, fileText);
 	}
 
 	@Override
 	public void createDirectory(String dirName) {
-        File f = new File(dirName);
-        if (!f.exists()) {
-                f.mkdirs();
-        }
+		File f = new File(dirName);
+		if (!f.exists()) {
+			f.mkdirs();
+		}
 	}
-    
-    /**
-     * Replaces all text in the existing file with the given text.
-     */
-    private void writeFile(String fileName, String fileText) {
-        FileWriter fw = null;
-        try {
-            File f = new File(fileName);
-            fw = new FileWriter(f, false);
-            fw.write(fileText);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
+	/**
+	 * Replaces all text in the existing file with the given text.
+	 */
+	private void writeFile(String fileName, String fileText) {
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, false);
+			fw.write(fileText);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	public boolean exists(String name) {
@@ -84,20 +85,20 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Commit recoverCommit(String id){
-		//System.out.println("Reading: " + id);
-		
-		//if its the default object id, just return a new object;
-		if(id.equals(new Commit().getId()))
+	public Commit recoverCommit(String id) {
+		// System.out.println("Reading: " + id);
+
+		// if its the default object id, just return a new object;
+		if (id.equals(new Commit().getId()))
 			return new Commit();
-		
-		String objDir = ".gitlet/objects/" + id ;
+
+		String objDir = ".gitlet/objects/" + id;
 		File d = new File(objDir);
-		if(!d.exists()){
-			throw new IllegalArgumentException("Gitlet not initialized!");
-			//return null;
+		if (!d.exists()) {
+			// throw new IllegalArgumentException("Gitlet not initialized!");
+			return null;
 		}
-			
+
 		String filename = objDir + "/" + id;
 		Commit recovered = null;
 		Commit parent = null;
@@ -105,35 +106,32 @@ public class FileSystemWriter implements IFileWriter {
 		String message;
 		HashMap<String, String> filePointers;
 		File f = new File(filename);
-		if(f.exists()){
-			try(
-		      InputStream file = new FileInputStream(filename);
-		      InputStream buffer = new BufferedInputStream(file);
-		      ObjectInput input = new ObjectInputStream (buffer);
-		    ){
-		      //deserialize the List
-		      String parentId = (String)input.readObject();
-		      if(!parentId.equals("null")){
-		    	  parent = recoverCommit(parentId);
-		      }
-		      
-		      input.readObject(); //this is the id, we already have it...
-		      message = (String)input.readObject();
-		      timeStamp = (Long)input.readObject();
-		      filePointers = (HashMap<String, String>)input.readObject();
-		      
-		      recovered = new Commit(parent, timeStamp, message, filePointers);
-		    }
-		    catch(ClassNotFoundException ex){
-		      fLogger.log(Level.SEVERE, "Cannot perform input. Class not found.", ex);
-		      
-		    }
-		    catch(IOException ex){
-		      fLogger.log(Level.SEVERE, "Cannot perform input.", ex);
-		    }
-			
+		if (f.exists()) {
+			try (InputStream file = new FileInputStream(filename);
+					InputStream buffer = new BufferedInputStream(file);
+					ObjectInput input = new ObjectInputStream(buffer);) {
+				// deserialize the List
+				String parentId = (String) input.readObject();
+				if (!parentId.equals("null")) {
+					parent = recoverCommit(parentId);
+				}
+
+				input.readObject(); // this is the id, we already have it...
+				message = (String) input.readObject();
+				timeStamp = (Long) input.readObject();
+				filePointers = (HashMap<String, String>) input.readObject();
+
+				recovered = new Commit(parent, timeStamp, message, filePointers);
+			} catch (ClassNotFoundException ex) {
+				fLogger.log(Level.SEVERE,
+						"Cannot perform input. Class not found.", ex);
+
+			} catch (IOException ex) {
+				fLogger.log(Level.SEVERE, "Cannot perform input.", ex);
+			}
+
 			return recovered;
-			
+
 		} else {
 			System.out.println("Id: " + id + " not found!");
 			return null;
@@ -141,29 +139,31 @@ public class FileSystemWriter implements IFileWriter {
 	}
 
 	@Override
-	public void saveCommit(Commit commit){
+	public void saveCommit(Commit commit) {
 		String directory = ".gitlet/objects/" + commit.getId();
 		String filename = directory + "/" + commit.getId();
 		File d = new File(directory);
-		if(!d.exists()){
-			d.mkdir();
-			try(
-			  // to seperate this class from the filesyste, the call to 
-			  // FileOutputStream has to be replaced with something more
-		      // abstract...
-			  OutputStream file = new FileOutputStream(filename); 
-			  OutputStream buffer = new BufferedOutputStream(file);
-			  ObjectOutput output = new ObjectOutputStream(buffer);
-			){
-				//System.out.println("Writing: " + this.id);
-				if(commit.getParent() != null) {
-					output.writeObject(commit.getParent().getId());				
+		File f = new File(filename);
+		if (!f.exists()) {
+			if(!d.exists())
+				d.mkdir();
+			try (
+			// to seperate this class from the filesyste, the call to
+			// FileOutputStream has to be replaced with something more
+			// abstract...
+			OutputStream file = new FileOutputStream(filename);
+					OutputStream buffer = new BufferedOutputStream(file);
+					ObjectOutput output = new ObjectOutputStream(buffer);) {
+				// System.out.println("Writing: " + this.id);
+				if (commit.getParent() != null) {
+					output.writeObject(commit.getParent().getId());
+				} else {
+					output.writeObject("null");
 				}
-				else
-				output.writeObject("null");
+
 				output.writeObject(commit.getId());
 				output.writeObject(commit.getMessage());
-				output.writeObject(commit.getTimeStamp());		
+				output.writeObject(commit.getTimeStamp());
 				output.writeObject(commit.getFilePointers());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -175,42 +175,40 @@ public class FileSystemWriter implements IFileWriter {
 	}
 
 	@Override
-	public String getCurrentBranchRef(){
+	public String getCurrentBranchRef() {
 		return getText(".gitlet/HEAD").replace("ref: ", "");
 	}
 
 	@Override
-	public String getCurrentHeadPointer(){
-		return getText(getCurrentBranchRef()); 
+	public String getCurrentHeadPointer() {
+		return getText(getCurrentBranchRef());
 	}
 
 	private String getText(String fileName) {
-	    try {
-	        byte[] encoded = Files.readAllBytes(Paths.get(fileName));
-	        return new String(encoded, StandardCharsets.UTF_8);
-	    } catch (IOException e) {
-	        return "";
-	    }
+		try {
+			byte[] encoded = Files.readAllBytes(Paths.get(fileName));
+			return new String(encoded, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			return "";
+		}
 	}
 
 	@Override
-	public String getWorkingDirectory(){
+	public String getWorkingDirectory() {
 		return System.getProperty("user.dir");
 	}
-	
-	private static final Logger fLogger =
-		    Logger.getLogger(Commit.class.getPackage().getName());
+
+	private static final Logger fLogger = Logger.getLogger(Commit.class
+			.getPackage().getName());
 
 	@Override
 	public void saveStaging(Staging staging) {
 		String filename = ".gitlet/objects/staging";
 
-		try(
-		  OutputStream file = new FileOutputStream(filename); 
-		  OutputStream buffer = new BufferedOutputStream(file);
-		  ObjectOutput output = new ObjectOutputStream(buffer);
-		){
-			output.writeObject(staging.getFilesToAdd());		
+		try (OutputStream file = new FileOutputStream(filename);
+				OutputStream buffer = new BufferedOutputStream(file);
+				ObjectOutput output = new ObjectOutputStream(buffer);) {
+			output.writeObject(staging.getFilesToAdd());
 			output.writeObject(staging.getFilesToRm());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -221,41 +219,38 @@ public class FileSystemWriter implements IFileWriter {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Staging recoverStaging() {
-		
-//		String objDir = ".gitlet/objects/staging";
-//		File d = new File(objDir);
-//		if(!d.exists()){
-//			throw new IllegalArgumentException("Gitlet not initialized!");
-//		}
-			
+
+		// String objDir = ".gitlet/objects/staging";
+		// File d = new File(objDir);
+		// if(!d.exists()){
+		// throw new IllegalArgumentException("Gitlet not initialized!");
+		// }
+
 		String filename = ".gitlet/objects/staging";
 		Staging recovered = null;
-		
+
 		File f = new File(filename);
-		if(f.exists()){
-			try(
-		      InputStream file = new FileInputStream(filename);
-		      InputStream buffer = new BufferedInputStream(file);
-		      ObjectInput input = new ObjectInputStream (buffer);
-		    ){
-		      
-		      List<String> filesToAdd = (List<String>)input.readObject();
-		      List<String> filesToRm = (List<String>)input.readObject();
-		      
-		      recovered = new Staging();
-		      recovered.setFilesToAdd(filesToAdd);
-		      recovered.setFilesToRm(filesToRm);
-		    }
-		    catch(ClassNotFoundException ex){
-		      fLogger.log(Level.SEVERE, "Cannot perform input. Class not found.", ex);
-		      
-		    }
-		    catch(IOException ex){
-		      fLogger.log(Level.SEVERE, "Cannot perform input.", ex);
-		    }
-			
+		if (f.exists()) {
+			try (InputStream file = new FileInputStream(filename);
+					InputStream buffer = new BufferedInputStream(file);
+					ObjectInput input = new ObjectInputStream(buffer);) {
+
+				List<String> filesToAdd = (List<String>) input.readObject();
+				List<String> filesToRm = (List<String>) input.readObject();
+
+				recovered = new Staging();
+				recovered.setFilesToAdd(filesToAdd);
+				recovered.setFilesToRm(filesToRm);
+			} catch (ClassNotFoundException ex) {
+				fLogger.log(Level.SEVERE,
+						"Cannot perform input. Class not found.", ex);
+
+			} catch (IOException ex) {
+				fLogger.log(Level.SEVERE, "Cannot perform input.", ex);
+			}
+
 			return recovered;
-			
+
 		} else {
 			System.out.println("Staging object not found!");
 			return null;
@@ -264,16 +259,43 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	public String[] getAllBranches() {
-		// TODO Auto-generated method stub
 		return new File(".gitlet/refs/heads").list();
 	}
 
 	@Override
 	public long lastModified(String name) {
-		// TODO Auto-generated method stub
 		return new File(name).lastModified();
 	}
 
+	@Override
+	public void copyFile(String filePath, String destPath) {
+		File destFile = new File(destPath);
+		File sourceFile = new File(filePath);
 
+		try {
+			if (!destFile.exists()) {
+				destFile.createNewFile();
+			}
+
+			FileChannel source = null;
+			FileChannel destination = null;
+
+			try {
+				source = new FileInputStream(sourceFile).getChannel();
+				destination = new FileOutputStream(destFile).getChannel();
+				destination.transferFrom(source, 0, source.size());
+			} finally {
+				if (source != null) {
+					source.close();
+				}
+				if (destination != null) {
+					destination.close();
+				}
+			}
+		} catch (Exception ex) {
+			System.out.println("Problem while copying file " + filePath);
+			ex.printStackTrace();
+		}
+	}
 
 }

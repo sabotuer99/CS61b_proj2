@@ -16,4 +16,5 @@ public interface IFileWriter {
 	void saveStaging(Staging staging);
 	String[] getAllBranches();
 	long lastModified(String name);
+	void copyFile(String filePath, String destPath);
 }

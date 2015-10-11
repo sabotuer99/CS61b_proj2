@@ -44,7 +44,7 @@ public class InitCommand implements ICommand {
 			fileWriter.createDirectory(".gitlet/refs/heads");			
 			
 			//create the initial commit
-			Commit initialCommit = new Commit(new Commit(), System.currentTimeMillis(), "initial commit", null);
+			Commit initialCommit = new Commit(null, System.currentTimeMillis(), "initial commit", null);
 			
 			//create the master branch pointing at initial commit
 			//save master branch in .gitlet/refs/heads folder
