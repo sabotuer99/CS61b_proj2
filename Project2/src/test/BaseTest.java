@@ -265,7 +265,7 @@ public class BaseTest {
         int numMessages = logChunks.length - 1;
         String[] messages = new String[numMessages];
         for (int i = 0; i < numMessages; i++) {
-            System.out.println(logChunks[i + 1]);
+            //System.out.println(logChunks[i + 1]);
             String[] logLines = logChunks[i + 1].split(LINE_SEPARATOR);
             messages[i] = logLines[3];
         }

@@ -31,18 +31,18 @@ public class Commit implements Serializable {
 
 		String text = "";
 
+		String parentText = "";
 		if (parent != null) {
-			String filePointersText = "";
-			if(filePointers != null){
-				filePointersText = Integer.toString(filePointers.hashCode());
-			}
-			
-			text =  filePointersText 
-					+ message
-					+ timeStamp.toString()
-					+ Integer.toString(parent.hashCode());
+			parentText = Integer.toString(parent.hashCode());
 		}
 		
+		String filePointersText = "";
+		if (filePointers != null) {
+			filePointersText = Integer.toString(filePointers.hashCode());
+		}
+
+		text = filePointersText + message + timeStamp.toString() + parentText;
+
 		this.id = Hasher.getSha256(text);
 		this.shortId = id.substring(0, 10);
 	}
@@ -50,7 +50,7 @@ public class Commit implements Serializable {
 	public String getId() {
 		return id;
 	}
-	
+
 	public String getShortId() {
 		return shortId;
 	}
@@ -77,9 +77,8 @@ public class Commit implements Serializable {
 		int idHash = id == null ? 0 : id.hashCode();
 		int mgHash = message == null ? 0 : message.hashCode();
 		int tsHash = timeStamp == null ? 0 : timeStamp.hashCode();
-		
+
 		return fpHash ^ idHash ^ mgHash ^ tsHash;
 	}
-	
 
 }

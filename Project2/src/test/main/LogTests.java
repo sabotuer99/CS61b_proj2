@@ -18,7 +18,7 @@ public class LogTests extends BaseTest {
 		this.stripNewLines = false;
 		gitlet("init");
 		String[] result = gitletErr("log");
-		System.out.println(result[0]);
+		//System.out.println(result[0]);
 	}
 	
 	
@@ -51,7 +51,7 @@ public class LogTests extends BaseTest {
 	}
 
 	@Test
-	public void log_orderCheck(){
+	public void log_orderCheck() throws InterruptedException{
 		//Arrange
 		this.stripNewLines = false;
 		createFile("aaa", "123");
@@ -84,6 +84,7 @@ public class LogTests extends BaseTest {
 	@Test
 	public void log_sanityCheck(){
 		//Arrange
+		this.stripNewLines = false;
 		createFile("aaa", "123");
 		createFile("bbb", "456");
 		createFile("ccc", "789");
@@ -91,14 +92,33 @@ public class LogTests extends BaseTest {
 		gitlet("init");
 		gitlet("add", "aaa");
 		gitlet("commit", "1st");
+		Long time1 = System.currentTimeMillis();
+		String log1 = (gitletErr("log")[0]);
 		gitlet("add", "bbb");
 		gitlet("commit", "2nd");
+		Long time2 = System.currentTimeMillis();
+		String log2 = (gitletErr("log")[0]);
 		gitlet("add", "ccc");
 		gitlet("commit", "3rd");
+		Long time3 = System.currentTimeMillis();
+		String log3 = (gitletErr("log")[0]);
 		gitlet("add", "aya");
 		
 		//Act
 		String[] result = gitletErr("log");
+		System.out.println("[================================]");
+		System.out.println(time1);
+		System.out.println(log1);
+		System.out.println("[================================]");
+		System.out.println(time2);
+		System.out.println(log2);
+		System.out.println("[================================]");
+		System.out.println(time3);
+		System.out.println(log3);
+		System.out.println("[================================]");
+		System.out.println(result[0]);
+		System.out.println("[================================]");
+		
 		
 		//Assert
 		assertEquals("",result[1]);

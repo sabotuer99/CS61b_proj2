@@ -31,7 +31,7 @@ public class LogCommand implements ICommand {
 		
 		while(head != null){
 			System.out.println("====");
-			System.out.println("Commit " + head.getId());		
+			System.out.println("Commit " + head.getId() + ".");		
 			String date = convertTime(head.getTimeStamp());			
 			System.out.println(date);
 			System.out.println(head.getMessage());	
@@ -44,7 +44,7 @@ public class LogCommand implements ICommand {
 
 	private String convertTime(long time){
 	    Date date = new Date(time);
-	    Format format = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+	    Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	    return format.format(date);
 	}
 

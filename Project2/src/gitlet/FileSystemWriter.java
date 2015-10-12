@@ -95,8 +95,8 @@ public class FileSystemWriter implements IFileWriter {
 		String objDir = ".gitlet/objects/" + id;
 		File d = new File(objDir);
 		if (!d.exists()) {
-			// throw new IllegalArgumentException("Gitlet not initialized!");
-			return null;
+			throw new IllegalArgumentException("commit not found!");
+			//return null;
 		}
 
 		String filename = objDir + "/" + id;
@@ -176,12 +176,14 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	public String getCurrentBranchRef() {
-		return getText(".gitlet/HEAD").replace("ref: ", "");
+		String ref = getText(".gitlet/HEAD").replace("ref: ", "");
+		return ref;
 	}
 
 	@Override
 	public String getCurrentHeadPointer() {
-		return getText(getCurrentBranchRef());
+		String head = getText(getCurrentBranchRef());
+		return head;
 	}
 
 	private String getText(String fileName) {
@@ -189,6 +191,7 @@ public class FileSystemWriter implements IFileWriter {
 			byte[] encoded = Files.readAllBytes(Paths.get(fileName));
 			return new String(encoded, StandardCharsets.UTF_8);
 		} catch (IOException e) {
+			e.printStackTrace();
 			return "";
 		}
 	}

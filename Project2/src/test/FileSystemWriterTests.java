@@ -158,4 +158,24 @@ public class FileSystemWriterTests extends BaseTest {
 		
 	}
 	
+	@Test
+	public void readAndWriteFiles_CorrectValues(){
+		createFile("test1", "aaa");
+		String aaa = getText("test1");
+		createFile("test1", "bbb");
+		String bbb = getText("test1");
+		createFile("test1", "ccc");
+		String ccc = getText("test1");
+		createFile("test1", "ddd");
+		String ddd = getText("test1");
+		createFile("test1", "eee");
+		String eee = getText("test1");
+		
+		assertEquals("aaa", aaa);
+		assertEquals("bbb", bbb);
+		assertEquals("ccc", ccc);
+		assertEquals("ddd", ddd);
+		assertEquals("eee", eee);
+	}
+	
 }

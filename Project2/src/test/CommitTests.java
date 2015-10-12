@@ -12,13 +12,13 @@ import org.junit.Test;
 public class CommitTests extends BaseTest{
 	
 	@Test
-	public void ctor_DefaultCtorIdGeneration_EmptySha256(){
+	public void ctor_DefaultCtorIdGeneration_KnownSha256(){
 		//Arrange
 		//Act
 		Commit sut = new Commit();
 		
 		//Assert
-		assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", sut.getId());
+		assertEquals("5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9", sut.getId());
 	}
 	
 	@Test
@@ -27,8 +27,8 @@ public class CommitTests extends BaseTest{
 		//Act
 		Commit sut = new Commit();
 		
-		//Assert
-		assertEquals("e3b0c44298", sut.getShortId());
+		//Assert      5feceb66ff
+		assertEquals("5feceb66ff", sut.getShortId());
 	}
 	
 	@Test
