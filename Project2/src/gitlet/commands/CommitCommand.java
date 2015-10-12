@@ -85,12 +85,20 @@ public class CommitCommand implements ICommand {
 		
 		//update reference in current branch to 
 		//new commit id
-		fileWriter.createFile(fileWriter.getCurrentBranchRef(), newCommit.getId());
+		fileWriter.createFile(fileWriter.getCurrentBranchRef(), id);
 		
 		//reset and save staging area
 		fileWriter.saveStaging(new Staging());
 		
 		return true;
+	}
+
+	public IFileWriter getFileWriter() {
+		return fileWriter;
+	}
+
+	public void setFileWriter(IFileWriter fileWriter) {
+		this.fileWriter = fileWriter;
 	}
 
 }

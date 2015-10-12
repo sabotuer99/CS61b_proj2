@@ -71,4 +71,12 @@ public class InitCommand implements ICommand {
 		return false;
 	}
 
+	public IFileWriter getFileWriter() {
+		return fileWriter;
+	}
+
+	public void setFileWriter(IFileWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
+
 }

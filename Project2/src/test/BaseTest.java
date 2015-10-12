@@ -30,6 +30,10 @@ public class BaseTest {
     protected boolean stripWarning;
     protected boolean stripNewLines = true;  
     private List<String> createdFiles;
+    
+    protected PrintStream originalOut = System.out;
+    protected PrintStream originalErr = System.err;
+    protected InputStream originalIn = System.in;
     /**
      * Deletes existing gitlet system, resets the folder that stores files used
      * in testing.
@@ -68,6 +72,8 @@ public class BaseTest {
         for(String name : createdFiles){
         	checkAndDelete(name);
         }
+        
+        restoreStreams();
     }
     
 	protected void checkAndDelete(String name){
@@ -93,45 +99,55 @@ public class BaseTest {
     
     //returns Stdout and Stderr in a string array
     protected String[] gitletErr(String... args) {
-        PrintStream originalOut = System.out;
-        PrintStream originalErr = System.err;
-        InputStream originalIn = System.in;
-        ByteArrayOutputStream printingResults = new ByteArrayOutputStream();
-        ByteArrayOutputStream errorResults = new ByteArrayOutputStream();
+    	ByteArrayOutputStream[] streams = captureStreamsAsStrings();
+
         try {
-            /*
-             * Below we change System.out, so that when you call
-             * System.out.println(), it won't print to the screen, but will
-             * instead be added to the printingResults object.
-             */
-            System.setOut(new PrintStream(printingResults));
-            System.setErr(new PrintStream(errorResults));
-
-            /*
-             * Prepares the answer "yes" on System.In, to pretend as if a user
-             * will type "yes". You won't be able to take user input during this
-             * time.
-             */
-            String answer = "yes";
-            InputStream is = new ByteArrayInputStream(answer.getBytes());
-            System.setIn(is);
-
             /* Calls the main method using the input arguments. */
             Gitlet.main(args);
-
         } finally {
             /*
              * Restores System.out and System.in (So you can print normally and
              * take user input normally again).
              */
-            System.setOut(originalOut);
-            System.setIn(originalIn);
-            System.setErr(originalErr);
+        	restoreStreams();
         }
         
+        return getStreamText(streams);
+    }
+
+    protected ByteArrayOutputStream[] captureStreamsAsStrings(){
+        /*
+         * Below we change System.out, so that when you call
+         * System.out.println(), it won't print to the screen, but will
+         * instead be added to the printingResults object.
+         */
+        ByteArrayOutputStream printingResults = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorResults = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(printingResults));
+        System.setErr(new PrintStream(errorResults));
+        
+        /*
+         * Prepares the answer "yes" on System.In, to pretend as if a user
+         * will type "yes". You won't be able to take user input during this
+         * time.
+         */
+        String answer = "yes";
+        InputStream is = new ByteArrayInputStream(answer.getBytes());
+        System.setIn(is);
+        
+		return new ByteArrayOutputStream[]{printingResults, errorResults};	
+    }
+    
+    protected void restoreStreams(){
+        System.setOut(originalOut);
+        System.setIn(originalIn);
+        System.setErr(originalErr);
+    }
+    
+    protected String[] getStreamText(ByteArrayOutputStream[] streams){
         //return the string array, stripping out the newlines to make assertions simpler
-        String stdout = printingResults.toString();
-        String stderr = errorResults.toString();
+        String stdout = streams[0].toString();
+        String stderr = streams[1].toString();
         
         if(stripNewLines){
         	stdout = stdout.replace("\n", "").replace("\r", "");
@@ -146,7 +162,7 @@ public class BaseTest {
         
         return new String[]{ stdout, stderr };
     }
-
+    
     /**
      * Returns the text from a standard text file (won't work with special
      * characters).

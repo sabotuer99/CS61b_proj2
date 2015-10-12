@@ -64,6 +64,7 @@ public class GitletPublicTest extends BaseTest{
      */
     @Test
     public void testBasicLog() {
+    	this.stripNewLines = false;
         gitlet("init");
         String commitMessage1 = "initial commit";
 

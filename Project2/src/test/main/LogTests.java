@@ -103,12 +103,12 @@ public class LogTests extends BaseTest {
 		//Assert
 		assertEquals("",result[1]);
 		assertTrue("log output should contain the 3rd commit", result[0].contains("3rd"));
-		assertTrue("log output should contain the 2nd commit", result[0].contains("2rd"));
+		assertTrue("log output should contain the 2nd commit", result[0].contains("2nd"));
 		assertTrue("log output should contain the 1st commit", result[0].contains("1st"));
 		assertTrue("log output should contain the 0th commit", result[0].contains("initial commit"));
 		
 	}
-
+	
 	@Test
 	public void log_shouldOnlyOutputOneChain(){
 		//Arrange

@@ -47,4 +47,12 @@ public class LogCommand implements ICommand {
 	    Format format = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
 	    return format.format(date);
 	}
+
+	public IFileWriter getFileWriter() {
+		return fileWriter;
+	}
+
+	public void setFileWriter(IFileWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
 }
