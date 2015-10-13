@@ -1,8 +1,7 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.Commit;
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
@@ -14,7 +13,7 @@ public class RmCommand implements ICommand {
 	public RmCommand(String filename) {
 		// TODO Auto-generated constructor stub
 		fileToRm = filename;
-		fileWriter = new FileSystemWriter();
+		fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override

@@ -178,4 +178,80 @@ public class FileSystemWriterTests extends BaseTest {
 		assertEquals("eee", eee);
 	}
 	
+	@Test
+	public void recoverCommit_IdMatchesOriginal(){
+		//Arrange
+		IFileWriter sut = getDefaultInstance();		
+		//new InitCommand().execute();
+		createDirectory(".gitlet/objects");
+		HashMap<String, String> testMap1 = new HashMap<String, String>();
+		testMap1.put("test", "test value");
+		testMap1.put("test2", "test value2");
+		
+		HashMap<String, String> testMap2 = new HashMap<String, String>();
+		testMap2.put("test", "test value");
+		testMap2.put("test2", "test value2");
+		testMap2.put("test3", "test value3");
+		
+		HashMap<String, String> testMap3 = new HashMap<String, String>();
+		testMap3.put("test", "test value");
+		testMap3.put("test2", "test value2");
+		testMap3.put("test3", "test value3");
+		testMap3.put("test4", "test value4");
+		
+		Commit newCom = new Commit();
+		sut.saveCommit(newCom);
+		Commit test1 = new Commit(newCom, 100L, "test1 commit", testMap1);
+		sut.saveCommit(test1);		
+		Commit test2 = new Commit(test1, 200L, "test2 commit", testMap2);		
+		sut.saveCommit(test2);
+		Commit test3 = new Commit(test2, 300L, "test3 commit", testMap3);		
+		sut.saveCommit(test3);
+		Commit recovered = sut.recoverCommit(test3.getId());
+		
+		//Act
+		assertEquals("newCom has wrong Id", newCom.getId(), recovered.getParent().getParent().getParent().getId());
+		assertEquals("Test1 has wrong Id", test1.getId(), recovered.getParent().getParent().getId());
+		assertEquals("Test2 has wrong Id", test2.getId(), recovered.getParent().getId());
+		assertEquals("Test3 has wrong Id", test3.getId(), recovered.getId());
+	}
+	
+	@Test
+	public void recoverCommit_filePointerHashMatchesOriginal(){
+		//Arrange
+		IFileWriter sut = getDefaultInstance();		
+		//new InitCommand().execute();
+		createDirectory(".gitlet/objects");
+		HashMap<String, String> testMap1 = new HashMap<String, String>();
+		testMap1.put("test", "test value");
+		testMap1.put("test2", "test value2");
+		
+		HashMap<String, String> testMap2 = new HashMap<String, String>();
+		testMap2.put("test", "test value");
+		testMap2.put("test2", "test value2");
+		testMap2.put("test3", "test value3");
+		
+		HashMap<String, String> testMap3 = new HashMap<String, String>();
+		testMap3.put("test", "test value");
+		testMap3.put("test2", "test value2");
+		testMap3.put("test3", "test value3");
+		testMap3.put("test4", "test value4");
+		
+		Commit newCom = new Commit();
+		sut.saveCommit(newCom);
+		Commit test1 = new Commit(newCom, 100L, "test1 commit", testMap1);
+		sut.saveCommit(test1);		
+		Commit test2 = new Commit(test1, 200L, "test2 commit", testMap2);		
+		sut.saveCommit(test2);
+		Commit test3 = new Commit(test2, 300L, "test3 commit", testMap3);		
+		sut.saveCommit(test3);
+		Commit recovered = sut.recoverCommit(test3.getId());
+		
+		//Act
+		assertEquals("newCom has wrong Id", newCom.filePointersHash(), recovered.getParent().getParent().getParent().filePointersHash());
+		assertEquals("Test1 has wrong Id", test1.filePointersHash(), recovered.getParent().getParent().filePointersHash());
+		assertEquals("Test2 has wrong Id", test2.filePointersHash(), recovered.getParent().filePointersHash());
+		assertEquals("Test3 has wrong Id", test3.filePointersHash(), recovered.filePointersHash());
+	}
+	
 }

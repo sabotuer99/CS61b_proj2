@@ -43,4 +43,41 @@ public class CommitTests extends BaseTest{
 		assertNotEquals(sut1.getId(), sut2.getId());
 	}
 	
+	
+	@Test
+	public void hashCode_identicalCommitsHaveIdenticalHashCode(){
+		//Act
+		Commit sut1 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		Commit sut2 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		
+		//Assert
+		assertEquals(sut1.getId(), sut2.getId());
+	}
+	
+	@Test
+	public void hashCode_sameParentFilePointers_sameHashCode(){
+		//Act
+		Commit sut1 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		Commit sut2 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		Commit sut3 = new Commit(sut1, 0L, "test", new HashMap<String, String>());
+		Commit sut4 = new Commit(sut2, 0L, "test", new HashMap<String, String>());
+		
+		//Assert
+		assertEquals(sut3.getId(), sut4.getId());
+	}
+	
+	@Test
+	public void hashCode_differentParentFilePointers_differentHashCode(){
+		//Act
+		Commit sut1 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		HashMap<String, String> testMap = new HashMap<String, String>();
+		testMap.put("test", "test");
+		Commit sut2 = new Commit(null, 0L, "test", testMap);
+		Commit sut3 = new Commit(sut1, 0L, "test", new HashMap<String, String>());
+		Commit sut4 = new Commit(sut2, 0L, "test", new HashMap<String, String>());
+		
+		//Assert
+		assertNotEquals(sut3.getId(), sut4.getId());
+	}
+	
 }

@@ -32,13 +32,10 @@ public class Commit implements Serializable {
 		String text = "";
 
 		String parentText = "";
+		String filePointersText = "";
 		if (parent != null) {
 			parentText = Integer.toString(parent.hashCode());
-		}
-		
-		String filePointersText = "";
-		if (filePointers != null) {
-			filePointersText = Integer.toString(filePointers.hashCode());
+			filePointersText = Integer.toString(parent.filePointersHash());
 		}
 
 		text = filePointersText + message + timeStamp.toString() + parentText;
@@ -73,12 +70,24 @@ public class Commit implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int fpHash = filePointers == null ? 0 : filePointers.hashCode();
+		int fpHash = parent == null ? 0 : parent.filePointersHash();
 		int idHash = id == null ? 0 : id.hashCode();
 		int mgHash = message == null ? 0 : message.hashCode();
 		int tsHash = timeStamp == null ? 0 : timeStamp.hashCode();
 
 		return fpHash ^ idHash ^ mgHash ^ tsHash;
+	}
+	
+	public int filePointersHash(){
+		if(this.filePointers == null)
+			return 0;
+		
+		int hash = 0;
+		for(String key : this.filePointers.keySet()){
+			hash ^= key.hashCode() << 1;
+			hash ^= this.filePointers.get(key).hashCode();
+		}
+		return hash;
 	}
 
 }

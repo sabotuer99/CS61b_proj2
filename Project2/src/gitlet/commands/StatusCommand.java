@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
@@ -13,7 +13,7 @@ public class StatusCommand implements ICommand {
 	private IFileWriter fileWriter;
 	
 	public StatusCommand(){
-		fileWriter = new FileSystemWriter();
+		fileWriter = FileWriterFactory.getWriter();
 	}
 	
 	@Override
@@ -48,17 +48,23 @@ public class StatusCommand implements ICommand {
 		
 		//print files in filesToAdd.
 		System.out.println("=== Staged Files ===");
-		if(staging.getFilesToAdd().size() > 0)
-		for(String file : staging.getFilesToAdd()){
-			System.out.println(file);
+		if(staging.getFilesToAdd().size() > 0){
+			List<String> filesToAdd = staging.getFilesToAdd();
+			Collections.sort(filesToAdd);
+			for(String file : filesToAdd){
+				System.out.println(file);
+			}
 		}
 		System.out.println();
 		
 		//print files in filesToRm
 		System.out.println("=== Files Marked for Removal ===");
-		if(staging.getFilesToRm().size() > 0)
-		for(String file : staging.getFilesToRm()){
-			System.out.println(file);
+		if(staging.getFilesToRm().size() > 0){
+			List<String> filesToRm = staging.getFilesToRm();
+			Collections.sort(filesToRm);
+			for(String file : staging.getFilesToRm()){
+				System.out.println(file);
+			}
 		}
 		return true;
 	}

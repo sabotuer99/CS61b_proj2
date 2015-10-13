@@ -1,8 +1,7 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.Commit;
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
@@ -16,7 +15,7 @@ public class CommitCommand implements ICommand {
 	public CommitCommand(String message) {
 		// TODO Auto-generated constructor stub
 		this.message = message;
-		this.fileWriter = new FileSystemWriter();
+		this.fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override

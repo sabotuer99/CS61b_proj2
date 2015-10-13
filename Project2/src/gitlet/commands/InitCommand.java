@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Commit;
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
@@ -14,7 +14,7 @@ public class InitCommand implements ICommand {
 	
 	public InitCommand(){
 		//these could be injected if I wanted to...
-		fileWriter = new FileSystemWriter();
+		fileWriter = FileWriterFactory.getWriter();
 		userDir = System.getProperty("user.dir");
 	}	
 	

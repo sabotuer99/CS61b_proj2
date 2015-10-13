@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Commit;
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 
 import java.text.Format;
@@ -14,7 +14,7 @@ public class LogCommand implements ICommand {
 
 	
 	public LogCommand() {
-		this.fileWriter = new FileSystemWriter();
+		this.fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override

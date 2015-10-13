@@ -2,12 +2,16 @@ package test.main;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import gitlet.FileWriterFactory;
 
 import java.io.File;
+
+import junit.framework.TestFailure;
 
 import org.junit.Test;
 
 import test.BaseTest;
+import test.TestFileWriter;
 
 public class CommitTests extends BaseTest {
 
@@ -129,6 +133,8 @@ public class CommitTests extends BaseTest {
 	@Test
 	public void commit_normalAddAndRemove(){
 		//Arrange
+		//FileWriterFactory.setWriter(new TestFileWriter());
+		
 		//Act
 			gitlet("init");
 			createFile("foo", "Yo");
@@ -336,5 +342,6 @@ public class CommitTests extends BaseTest {
 		assertEquals("Should be no output on Stdout","", result1[0]);
 		assertEquals("Should be no output on Stderr","", result1[1]);
 	}
+
 
 }

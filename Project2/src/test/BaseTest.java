@@ -1,5 +1,6 @@
 package test;
 
+import gitlet.FileWriterFactory;
 import gitlet.Gitlet;
 
 import java.io.ByteArrayInputStream;
@@ -74,6 +75,7 @@ public class BaseTest {
         }
         
         restoreStreams();
+        FileWriterFactory.useDefault();
     }
     
 	protected void checkAndDelete(String name){

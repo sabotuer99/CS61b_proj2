@@ -1,7 +1,6 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
@@ -13,7 +12,7 @@ public class AddCommand implements ICommand {
 	public AddCommand(String filename) {
 		// TODO Auto-generated constructor stub
 		fileToAdd = filename;
-		fileWriter = new FileSystemWriter();
+		fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override

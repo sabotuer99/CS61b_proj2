@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.FileSystemWriter;
+import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 
 public class BranchCommand implements ICommand {
@@ -11,7 +11,7 @@ public class BranchCommand implements ICommand {
 	public BranchCommand(String branchName) {
 		// TODO Auto-generated constructor stub
 		this.branchName = branchName;
-		this.fileWriter = new FileSystemWriter();
+		this.fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override
