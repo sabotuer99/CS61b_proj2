@@ -41,16 +41,16 @@ public class TestFileWriter implements IFileWriter {
 		}
 		
 		//if fileName has path information, check that path was created
-		if(fileName.lastIndexOf("/") != -1){
-			String dirPath = fileName.substring(0, fileName.lastIndexOf("/"));
-			if(createdDirectories.contains(dirPath)){
-				createdFiles.put(fileName, fileText);
-				updateTimestamps(fileName);
-			}
-		} else {
+//		if(fileName.lastIndexOf("/") != -1){
+//			String dirPath = fileName.substring(0, fileName.lastIndexOf("/"));
+//			if(createdDirectories.contains(dirPath)){
+//				createdFiles.put(fileName, fileText);
+//				updateTimestamps(fileName);
+//			}
+//		} else {
 			createdFiles.put(fileName, fileText);
 			updateTimestamps(fileName);
-		}
+	//	}
 	}
 
 	private void updateTimestamps(String filename){
@@ -133,7 +133,7 @@ public class TestFileWriter implements IFileWriter {
 	@Override
 	public String[] getAllBranches() {
 		// TODO Auto-generated method stub
-		return (String[]) branches.keySet().toArray();
+		return branches.keySet().toArray(new String[0]);
 	}
 
 	@Override
@@ -155,6 +155,24 @@ public class TestFileWriter implements IFileWriter {
 
 	public void setCanWrite(boolean canWrite) {
 		this.canWrite = canWrite;
+	}
+
+	@Override
+	public String getBranchHead(String branch) {
+		// TODO Auto-generated method stub
+		return branches.get(branch);
+	}
+
+	@Override
+	public void makeBranchHead(String branch) {
+		String path = ".gitlet/refs/heads/" + branch;
+		if(exists(path))
+			createFile(".gitlet/HEAD", "ref: " + path);		
+	}
+
+	@Override
+	public String getCurrentBranch() {
+		return getCurrentBranchRef().replace(".gitlet/refs/heads/", "");
 	}
 
 

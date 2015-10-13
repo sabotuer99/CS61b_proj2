@@ -122,7 +122,7 @@ public class CheckoutTests extends BaseTest {
 		String[] result1 = gitletErr("status");
 		String expected1 = 
 				"=== Branches ==="+
-				"master"+
+				"*master"+
 				""+
 				"=== Staged Files ==="+
 				"bar"+
@@ -162,8 +162,10 @@ public class CheckoutTests extends BaseTest {
 	}
 
 	@Test
-	public void checkout_file_normalOperation(){
+	public void checkout_file_normalOperation() throws InterruptedException{
+		//FileWriterFactory.setWriter(new TestFileWriter());
 		//Arrange
+		//int WAITPERIOD = 2000;
 		gitlet("init");
 		createFile("foo", "hi");
 		gitlet("add", "foo");
@@ -179,29 +181,33 @@ public class CheckoutTests extends BaseTest {
 		//Act
 		//Assert
 		String[] result = gitletErr("checkout", comid1, "foo");
+		String content = getText("foo");
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
-		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("file content doesn't match", "hi", content);
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
 		result = gitletErr("checkout", "foo");
+		content = getText("foo");
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
-		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("file content doesn't match", "hello", content);
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
-		gitlet("rm", "foo");
+		checkAndDelete("foo");
 		result = gitletErr("checkout", "foo");
+		//Thread.sleep(WAITPERIOD);
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
-		assertEquals("file content doesn't match", "hello", getText("foo"));
+		assertEquals("file content doesn't match", "hello", content);
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 		
-		gitlet("rm", "foo");
+		checkAndDelete("foo");
 		result = gitletErr("checkout", comid1, "foo");
+		//Thread.sleep(WAITPERIOD);
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
-		assertEquals("file content doesn't match", "hi", getText("foo"));
+		assertEquals("file content doesn't match", "hi", content);
 		assertEquals("extra file(s) detected", baselineFileCount, f.list().length);
 	}
 

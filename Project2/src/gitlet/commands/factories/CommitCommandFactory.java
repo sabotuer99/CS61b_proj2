@@ -1,6 +1,5 @@
 package gitlet.commands.factories;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.commands.CommitCommand;
 import gitlet.commands.ICommand;
 import gitlet.commands.NoOpCommand;

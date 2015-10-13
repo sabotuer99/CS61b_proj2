@@ -13,10 +13,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -276,29 +276,31 @@ public class FileSystemWriter implements IFileWriter {
 		File sourceFile = new File(filePath);
 
 		try {
-			if (!destFile.exists()) {
-				destFile.createNewFile();
-			}
-
-			FileChannel source = null;
-			FileChannel destination = null;
-
-			try {
-				source = new FileInputStream(sourceFile).getChannel();
-				destination = new FileOutputStream(destFile).getChannel();
-				destination.transferFrom(source, 0, source.size());
-			} finally {
-				if (source != null) {
-					source.close();
-				}
-				if (destination != null) {
-					destination.close();
-				}
-			}
-		} catch (Exception ex) {
-			System.out.println("Problem while copying file " + filePath);
-			ex.printStackTrace();
+			Files.copy(sourceFile.toPath(), destFile.toPath(),
+					   StandardCopyOption.COPY_ATTRIBUTES,StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			System.err.println("Problem copying file: " + filePath + " to " + destPath );
+			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getBranchHead(String branch) {
+		String path = ".gitlet/refs/heads/" + branch;
+		String head = getText(path);
+		return head;
+	}
+
+	@Override
+	public void makeBranchHead(String branch) {
+		String path = ".gitlet/refs/heads/" + branch;
+		if(exists(path))
+			createFile(".gitlet/HEAD", "ref: " + path);
+	}
+	
+	@Override
+	public String getCurrentBranch() {
+		return getCurrentBranchRef().replace(".gitlet/refs/heads/", "");
 	}
 
 }

@@ -55,7 +55,7 @@ public class BaseTest {
         f.mkdirs();
         
         createdFiles = new ArrayList<String>();
-        stripWarning = false;
+        stripWarning = true;
         stripNewLines = true;
     }
     

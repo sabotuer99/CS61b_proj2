@@ -12,9 +12,12 @@ public interface IFileWriter {
 	String getWorkingDirectory();
 	String getCurrentBranchRef();
 	String getCurrentHeadPointer();
+	String getBranchHead(String branch);
+	void makeBranchHead(String branch);
 	Staging recoverStaging();
 	void saveStaging(Staging staging);
 	String[] getAllBranches();
 	long lastModified(String name);
 	void copyFile(String filePath, String destPath);
+	String getCurrentBranch();
 }
