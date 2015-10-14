@@ -4,9 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.AssertionFailedError;
 
 public class FileSystemWriter implements IFileWriter {
 
@@ -343,6 +341,22 @@ public class FileSystemWriter implements IFileWriter {
 		}// since we already checked that the file sizes are equal
 			// if we're here we reached the end of both files without a mismatch
 		return true;
+	}
+
+	@Override
+	public String[] getAllCommitIds() {
+		File objects = new File(".gitlet/objects");
+		
+		//get everything gut the "staging" file
+		FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+            	if("staging".equals(name))
+            		return false;
+            	return true;
+            }
+		};
+		return objects.list(filter);
 	}
 
 }

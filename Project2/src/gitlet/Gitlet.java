@@ -63,6 +63,7 @@ public class Gitlet {
 		commands.add(new CommitCommandFactory());
 		commands.add(new LogCommandFactory());
 		commands.add(new CheckoutCommandFactory());
+		commands.add(new GlobalLogCommandFactory());
 		
 		return commands;
 	}

@@ -21,4 +21,5 @@ public interface IFileWriter {
 	void copyFile(String filePath, String destPath);
 	String getCurrentBranch();
 	boolean filesEqual(String file1, String file2);
+	String[] getAllCommitIds();
 }

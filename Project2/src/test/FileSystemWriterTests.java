@@ -270,4 +270,25 @@ public class FileSystemWriterTests extends BaseTest {
 		checkAndDelete("dir1");
 	}
 	
+	@Test
+	public void getAllCommits_returnsEverythingButStaging(){
+		//Arrange
+		IFileWriter sut = getDefaultInstance();	
+		createDirectory(".gitlet/objects");
+		createDirectory(".gitlet/objects/foo");
+		createDirectory(".gitlet/objects/bar");
+		createDirectory(".gitlet/objects/baz");
+		createFile(".gitlet/objects/staging", "nada");
+		
+		//Act
+		String[] result = sut.getAllCommitIds();
+		List<String> listResult = Arrays.asList(result);
+		
+		//Assert
+		assertTrue(listResult.contains("foo"));
+		assertTrue(listResult.contains("bar"));
+		assertTrue(listResult.contains("baz"));
+		assertEquals(3, result.length);
+	}
+	
 }

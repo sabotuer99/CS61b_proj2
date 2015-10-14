@@ -182,6 +182,12 @@ public class TestFileWriter implements IFileWriter {
 		return f1 != null && f2 != null && f1.equals(f2);
 	}
 
+	@Override
+	public String[] getAllCommitIds() {
+		
+		return savedCommits.keySet().toArray(new String[0]);
+	}
+
 
 
 }

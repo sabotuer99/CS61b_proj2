@@ -15,6 +15,7 @@ public class GlobalLogTests extends BaseTest {
 	@Test
 	public void globallog_formatCheck(){
 		//Arrange
+		stripNewLines = false;
 		createFile("aaa", "123");
 		createFile("bbb", "456");
 		createFile("ccc", "789");
@@ -31,8 +32,8 @@ public class GlobalLogTests extends BaseTest {
 		//Act
 		String[] result = gitletErr("global-log");
 		
-	    Pattern p = Pattern.compile("(====[\\n\\s]?Commit [\\d\\w]+\\.[\\n\\s]?\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}[\\n\\s][^=]+)*");
-	    Matcher matcher = p.matcher(result[0]);
+		Pattern p = Pattern.compile("(====[\\n\\s]?Commit [\\d\\w]+\\.[\\n\\s]?\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}[\\n\\s][^=]+)*");	    
+		Matcher matcher = p.matcher(result[0]);
 			
 		//Assert
 		assertEquals("",result[1]);
@@ -42,6 +43,7 @@ public class GlobalLogTests extends BaseTest {
 	@Test
 	public void globallog_notAncestorsOrNotEvenReachable(){
 		//Arrange
+		stripNewLines = false;
 		gitlet("init"); //com0
 		createFile("foo", "hi");
 		gitlet("add", "foo");
@@ -64,7 +66,7 @@ public class GlobalLogTests extends BaseTest {
 		
 		//Assert
 		assertEquals("",result1[1]);
-		assertEquals("global-log should output all 5 commits", 5, extractCommitMessages(result1[0]));		
+		assertEquals("global-log should output all 5 commits", 5, extractCommitMessages(result1[0]).length);		
 		assertTrue("global-log output should contain orphaned commits", result1[0].contains("to the beginning"));
 		assertTrue("global-log output should contain the current commit", result1[0].contains("hawayu"));
 		assertTrue("global-log output should contain commits in other branches", result1[0].contains("say hello"));
@@ -75,6 +77,7 @@ public class GlobalLogTests extends BaseTest {
 	@Test
 	public void globallog_shouldOutputWholeTree(){
 		//Arrange
+		stripNewLines = false;
 		createFile("aaa", "123");
 		createFile("bbb", "456");
 		createFile("ccc", "789");
@@ -95,7 +98,7 @@ public class GlobalLogTests extends BaseTest {
 		
 		//Assert
 		assertEquals("",result1[1]);
-		assertEquals("global-log should output all 4 commits", 4, extractCommitMessages(result1[0]));		
+		assertEquals("global-log should output all 4 commits", 4, extractCommitMessages(result1[0]).length);		
 		assertTrue("global-log output should contain the 'more' commit", result1[0].contains("more"));
 		assertTrue("global-log output should contain the 'wow' commit", result1[0].contains("wow"));
 		assertTrue("global-log output should contain the '1st' commit", result1[0].contains("1st"));
