@@ -4,6 +4,10 @@ import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 import gitlet.Staging;
 
+import java.io.File;
+
+import junit.framework.AssertionFailedError;
+
 public class AddCommand implements ICommand {
 
 	private IFileWriter fileWriter;
@@ -59,7 +63,14 @@ public class AddCommand implements ICommand {
 		} else {		
 		//if file is in commit, compare modified date of file in working directory with 
 		//modified date of file in commit directory. If match, file is unchanged
-			if(fileWriter.lastModified(commitFile) == fileWriter.lastModified(fileToAdd)){
+	
+			long commitLM = fileWriter.lastModified(commitFile);
+			long toAddLM = fileWriter.lastModified(fileToAdd);
+			//debugging
+			//String ts1 = convertTime(commitLM);
+			//String ts2 = convertTime(toAddLM);		
+			//if(commitLM == toAddLM){
+			if(commitLM == toAddLM && fileWriter.filesEqual(commitFile, fileToAdd)){
 				System.out.println("File has not been modified since the last commit.");
 				System.err.println("File has not been modified since the last commit.");
 				return false;
@@ -80,5 +91,11 @@ public class AddCommand implements ICommand {
 	public void setFileWriter(IFileWriter fileWriter) {
 		this.fileWriter = fileWriter;
 	}
+	
+//	private String convertTime(long time){
+//	    Date date = new Date(time);
+//	    Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS");
+//	    return format.format(date);
+//	}
 
 }

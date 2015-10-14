@@ -1,12 +1,10 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-
 import gitlet.Commit;
 import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
+
+import java.util.HashMap;
 
 public class CheckoutBranchCommand implements ICommand {
 

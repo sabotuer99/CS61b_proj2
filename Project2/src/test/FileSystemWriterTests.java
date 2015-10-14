@@ -254,4 +254,20 @@ public class FileSystemWriterTests extends BaseTest {
 		assertEquals("Test3 has wrong Id", test3.filePointersHash(), recovered.filePointersHash());
 	}
 	
+	@Test
+	public void copy_shouldCreateDestinationDirStructure(){
+		//Arrange
+		IFileWriter sut = getDefaultInstance();		
+		createFile("foo", "bar");
+		
+		//Act
+		sut.copyFile("foo", "dir1/dir2/foo");
+		
+		//Assert
+		assertTrue(sut.exists("dir1/dir2/foo"));
+		
+		//Cleanup
+		checkAndDelete("dir1");
+	}
+	
 }

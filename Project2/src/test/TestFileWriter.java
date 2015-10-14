@@ -175,6 +175,13 @@ public class TestFileWriter implements IFileWriter {
 		return getCurrentBranchRef().replace(".gitlet/refs/heads/", "");
 	}
 
+	@Override
+	public boolean filesEqual(String file1, String file2) {
+		String f1 = createdFiles.get(file1);
+		String f2 = createdFiles.get(file2);
+		return f1 != null && f2 != null && f1.equals(f2);
+	}
+
 
 
 }

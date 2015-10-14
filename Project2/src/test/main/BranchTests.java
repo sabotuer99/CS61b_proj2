@@ -80,7 +80,8 @@ public class BranchTests extends BaseTest{
 				"=== Staged Files ==="+
 				"bar"+
 				""+
-				"=== Files Marked for Removal ===";
+				"=== Files Marked for Removal ==="+
+				"foo";
 		
 		gitlet("branch", "nanosecond");	
 		String result2 = gitlet("status");
@@ -92,7 +93,8 @@ public class BranchTests extends BaseTest{
 				"=== Staged Files ==="+
 				"bar"+
 				""+
-				"=== Files Marked for Removal ===";
+				"=== Files Marked for Removal ==="+
+				"foo";
 		
 		//Assert
 		assertEquals(expected1, result1);

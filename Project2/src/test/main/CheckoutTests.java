@@ -166,11 +166,14 @@ public class CheckoutTests extends BaseTest {
 		//FileWriterFactory.setWriter(new TestFileWriter());
 		//Arrange
 		//int WAITPERIOD = 2000;
+		echoStreams = true;
+		//stripNewLines = false;
 		gitlet("init");
 		createFile("foo", "hi");
 		gitlet("add", "foo");
 		gitlet("commit", "say hi");
 		String comid1 = getLastCommitId(gitlet("log"));
+		//Thread.sleep(1000); //on linux, can only get 1sec resolution on modified date X(
 		createFile("foo", "hello");
 		gitlet("add", "foo");
 		gitlet("commit", "say hello");
@@ -196,7 +199,7 @@ public class CheckoutTests extends BaseTest {
 		
 		checkAndDelete("foo");
 		result = gitletErr("checkout", "foo");
-		//Thread.sleep(WAITPERIOD);
+		content = getText("foo");
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hello", content);
@@ -204,7 +207,7 @@ public class CheckoutTests extends BaseTest {
 		
 		checkAndDelete("foo");
 		result = gitletErr("checkout", comid1, "foo");
-		//Thread.sleep(WAITPERIOD);
+		content = getText("foo");
 		assertEquals("Should be no output on Stdout","", result[0]);
 		assertEquals("Should be no output on Stderr","", result[1]);
 		assertEquals("file content doesn't match", "hi", content);

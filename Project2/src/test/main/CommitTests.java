@@ -58,8 +58,8 @@ public class CommitTests extends BaseTest {
 		String[] result = gitletErr("commit", "Nothing changed");
 		
 		//Assert
-		assertTrue("Should be no output on Stdout", result[0] == null);
-		assertTrue("Should be no output on Stderr", result[1] == null);
+		assertEquals("Should be no output on Stdout", "",  result[0]);
+		assertEquals("Should be no output on Stderr", "",  result[1]);
 	}
 
 	@Test

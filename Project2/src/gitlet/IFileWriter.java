@@ -20,4 +20,5 @@ public interface IFileWriter {
 	long lastModified(String name);
 	void copyFile(String filePath, String destPath);
 	String getCurrentBranch();
+	boolean filesEqual(String file1, String file2);
 }

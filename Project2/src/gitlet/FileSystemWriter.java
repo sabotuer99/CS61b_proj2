@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import junit.framework.AssertionFailedError;
 
 public class FileSystemWriter implements IFileWriter {
 
@@ -89,14 +92,14 @@ public class FileSystemWriter implements IFileWriter {
 		// System.out.println("Reading: " + id);
 
 		// if its the default object id, just return a new object;
-		//if (id.equals(new Commit().getId()))
-		//	return new Commit();
+		// if (id.equals(new Commit().getId()))
+		// return new Commit();
 
 		String objDir = ".gitlet/objects/" + id;
 		File d = new File(objDir);
 		if (!d.exists()) {
 			throw new IllegalArgumentException("commit not found!");
-			//return null;
+			// return null;
 		}
 
 		String filename = objDir + "/" + id;
@@ -145,7 +148,7 @@ public class FileSystemWriter implements IFileWriter {
 		File d = new File(directory);
 		File f = new File(filename);
 		if (!f.exists()) {
-			if(!d.exists())
+			if (!d.exists())
 				d.mkdir();
 			try (
 			// to seperate this class from the filesyste, the call to
@@ -272,14 +275,22 @@ public class FileSystemWriter implements IFileWriter {
 
 	@Override
 	public void copyFile(String filePath, String destPath) {
-		File destFile = new File(destPath);
-		File sourceFile = new File(filePath);
+
+		File dest = new File(destPath);
+		File source = new File(filePath);
+		
+		//check if destination directory exists and create if it doesn't
+		if(destPath.lastIndexOf("/") > -1){
+			File destDir = new File(destPath.substring(0, destPath.lastIndexOf("/")));
+			if(!destDir.exists())
+				destDir.mkdirs();
+		}
 
 		try {
-			Files.copy(sourceFile.toPath(), destFile.toPath(),
-					   StandardCopyOption.COPY_ATTRIBUTES,StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(source.toPath(), dest.toPath(),
+					StandardCopyOption.COPY_ATTRIBUTES,
+					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			System.err.println("Problem copying file: " + filePath + " to " + destPath );
 			e.printStackTrace();
 		}
 	}
@@ -294,13 +305,44 @@ public class FileSystemWriter implements IFileWriter {
 	@Override
 	public void makeBranchHead(String branch) {
 		String path = ".gitlet/refs/heads/" + branch;
-		if(exists(path))
+		if (exists(path))
 			createFile(".gitlet/HEAD", "ref: " + path);
 	}
-	
+
 	@Override
 	public String getCurrentBranch() {
 		return getCurrentBranchRef().replace(".gitlet/refs/heads/", "");
+	}
+
+	@Override
+	public boolean filesEqual(String a, String b) {
+
+		File file1 = new File(a);
+		File file2 = new File(b);
+
+		if (file1.length() != file2.length()) {
+			return false;
+		}
+
+		try (InputStream in1 = new BufferedInputStream(new FileInputStream(file1));
+				InputStream in2 = new BufferedInputStream(new FileInputStream(file2));) 
+        {
+			int value1, value2;
+			do {
+				// since we're buffered read() isn't expensive
+				value1 = in1.read();
+				value2 = in2.read();
+				if (value1 != value2) {
+					return false;
+				}
+			} while (value1 >= 0);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}// since we already checked that the file sizes are equal
+			// if we're here we reached the end of both files without a mismatch
+		return true;
 	}
 
 }

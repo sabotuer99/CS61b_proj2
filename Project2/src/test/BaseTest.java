@@ -30,6 +30,8 @@ public class BaseTest {
     
     protected boolean stripWarning;
     protected boolean stripNewLines = true;  
+    protected boolean captureStreams;
+    protected boolean echoStreams;
     private List<String> createdFiles;
     
     protected PrintStream originalOut = System.out;
@@ -57,6 +59,8 @@ public class BaseTest {
         createdFiles = new ArrayList<String>();
         stripWarning = true;
         stripNewLines = true;
+        captureStreams = true;
+        echoStreams = false;
     }
     
     @After
@@ -101,7 +105,9 @@ public class BaseTest {
     
     //returns Stdout and Stderr in a string array
     protected String[] gitletErr(String... args) {
-    	ByteArrayOutputStream[] streams = captureStreamsAsStrings();
+    	ByteArrayOutputStream[] streams = null;
+    	if(captureStreams)
+    		streams = captureStreamsAsStrings();
 
         try {
             /* Calls the main method using the input arguments. */
@@ -111,7 +117,8 @@ public class BaseTest {
              * Restores System.out and System.in (So you can print normally and
              * take user input normally again).
              */
-        	restoreStreams();
+        	if(captureStreams)
+        		restoreStreams();
         }
         
         return getStreamText(streams);
@@ -147,6 +154,10 @@ public class BaseTest {
     }
     
     protected String[] getStreamText(ByteArrayOutputStream[] streams){
+    	
+    	if(streams == null)
+    		return new String[]{ "", "" };
+    	
         //return the string array, stripping out the newlines to make assertions simpler
         String stdout = streams[0].toString();
         String stderr = streams[1].toString();
@@ -160,6 +171,11 @@ public class BaseTest {
         	stdout = stdout.replace("Warning: The command you entered may alter the files "
 						+ "in your working directory. Uncommitted changes may be lost. "
 						+ "Are you sure you want to continue? (yes/no)", "");
+        }
+        
+        if(echoStreams){
+        	System.out.println(stdout);
+        	System.err.println(stderr);
         }
         
         return new String[]{ stdout, stderr };
@@ -191,6 +207,7 @@ public class BaseTest {
         if (!f.exists()) {
             try {
                 f.createNewFile();
+                f.setLastModified(System.currentTimeMillis() * 1000);
             } catch (IOException e) {
                 e.printStackTrace();
             }
