@@ -1,21 +1,41 @@
 package gitlet.commands;
 
+import gitlet.Commit;
+import gitlet.FileWriterFactory;
+import gitlet.IFileWriter;
+
 public class FindCommand implements ICommand {
 
-	public FindCommand(String[] args) {
-		// TODO Auto-generated constructor stub
+	String message;
+	IFileWriter fileWriter;
+	
+	public FindCommand(String message) {
+		this.message = message;
+		fileWriter = FileWriterFactory.getWriter();
 	}
 
 	@Override
 	public boolean isDangerous() {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
-		return false;
+		boolean found = false;
+		for(String id : fileWriter.getAllCommitIds()){
+			Commit head = fileWriter.recoverCommit(id);
+			if(message.equals(head.getMessage())){
+				found = true;
+				System.out.println(id);
+			}
+		}
+		
+		if(!found){
+			System.out.println("Found no commit with that message");
+		}
+		
+		return true;
 	}
 
 }

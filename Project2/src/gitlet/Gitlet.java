@@ -64,6 +64,7 @@ public class Gitlet {
 		commands.add(new LogCommandFactory());
 		commands.add(new CheckoutCommandFactory());
 		commands.add(new GlobalLogCommandFactory());
+		commands.add(new FindCommandFactory());
 		
 		return commands;
 	}
