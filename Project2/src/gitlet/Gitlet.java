@@ -66,6 +66,7 @@ public class Gitlet {
 		commands.add(new GlobalLogCommandFactory());
 		commands.add(new FindCommandFactory());
 		commands.add(new RmBranchCommandFactory());
+		commands.add(new ResetCommandFactory());
 		
 		return commands;
 	}

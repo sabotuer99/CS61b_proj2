@@ -20,7 +20,7 @@ public class ResetCommandFactory implements ICommandFactory {
 	@Override
 	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return new ResetCommand(args);
+		return new ResetCommand(args[1]);
 	}
 
 }

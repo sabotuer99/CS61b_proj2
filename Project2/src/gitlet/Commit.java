@@ -43,6 +43,20 @@ public class Commit implements Serializable {
 		this.id = Hasher.getSha256(text);
 		this.shortId = id.substring(0, 10);
 	}
+	
+	public String findSplitPoint(Commit other){
+		
+		if(other == null)
+			return null;
+		
+		if(this.equals(other))
+			return this.id;
+		
+		if(this.timeStamp >= other.timeStamp)
+			return other.findSplitPoint(this.parent);
+		else
+			return this.findSplitPoint(other.parent);
+	}
 
 	public String getId() {
 		return id;

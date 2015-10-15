@@ -80,4 +80,38 @@ public class CommitTests extends BaseTest{
 		assertNotEquals(sut3.getId(), sut4.getId());
 	}
 	
+	@Test
+	public void findSplitPoint_findsCommonAncestor(){
+		//Arrange
+		Commit sut1 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		Commit sut2 = new Commit(sut1, 10L, "test", new HashMap<String, String>());
+		Commit sut3 = new Commit(sut1, 20L, "test", new HashMap<String, String>());
+		Commit sut4 = new Commit(sut3, 30L, "test", new HashMap<String, String>());
+		
+		//Act
+		String result1 = sut2.findSplitPoint(sut4);
+		String result2 = sut4.findSplitPoint(sut2);
+		
+		//Assert
+		assertEquals(sut1.getId(), result1);
+		assertEquals(sut1.getId(), result2);
+	}
+	
+	@Test
+	public void findSplitPoint_noBranches(){
+		//Arrange
+		Commit sut1 = new Commit(null, 0L, "test", new HashMap<String, String>());
+		Commit sut2 = new Commit(sut1, 10L, "test", new HashMap<String, String>());
+		Commit sut3 = new Commit(sut2, 20L, "test", new HashMap<String, String>());
+		Commit sut4 = new Commit(sut3, 30L, "test", new HashMap<String, String>());
+		
+		//Act
+		String result1 = sut1.findSplitPoint(sut4);
+		String result2 = sut4.findSplitPoint(sut1);
+		
+		//Assert
+		assertEquals(sut1.getId(), result1);
+		assertEquals(sut1.getId(), result2);
+	}
+	
 }
