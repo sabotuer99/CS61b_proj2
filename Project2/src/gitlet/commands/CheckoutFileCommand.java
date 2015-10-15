@@ -1,6 +1,5 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;
 
@@ -58,5 +57,4 @@ public class CheckoutFileCommand implements ICommand {
 		
 		return true;
 	}
-
 }

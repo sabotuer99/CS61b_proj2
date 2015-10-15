@@ -83,6 +83,15 @@ public class Commit implements Serializable {
 	}
 
 	@Override
+	public boolean equals(Object o){
+		if(o instanceof Commit){
+			Commit other = (Commit)o;
+			return this.hashCode() == other.hashCode();
+		}
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		int fpHash = parent == null ? 0 : parent.filePointersHash();
 		int idHash = id == null ? 0 : id.hashCode();

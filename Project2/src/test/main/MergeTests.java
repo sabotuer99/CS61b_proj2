@@ -4,12 +4,20 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
+import org.junit.After;
 import org.junit.Test;
 
 import test.BaseTest;
 
 public class MergeTests extends BaseTest {
 
+	@After
+	@Override
+	public void tearDown(){
+		super.tearDown();
+		checkAndDelete("foo.conflicted");
+	}
+	
 	@Test
 	public void merge_branchNotFound(){
 		//Arrange
@@ -38,6 +46,8 @@ public class MergeTests extends BaseTest {
 
 	@Test
 	public void merge_simpleTest(){
+		echoStreams = true;
+		
 		//Arrange
 		gitlet("init"); //com0
 		File f = new File(System.getProperty("user.dir"));
@@ -50,7 +60,7 @@ public class MergeTests extends BaseTest {
 		gitlet("commit", "say hi"); //com1
 		gitlet("branch", "dev");
 		createFile("foo", "hello");
-		createFile("yo", "bar");
+		createFile("bar", "yo");
 		gitlet("add", "foo");
 		gitlet("add", "bar");
 		gitlet("commit", "say hello"); //comL
@@ -79,6 +89,7 @@ public class MergeTests extends BaseTest {
 
 	@Test
 	public void merge_withFuture(){
+		echoStreams = true;
 		//Arrange
 		gitlet("init"); //com0
 		File f = new File(System.getProperty("user.dir"));
@@ -91,7 +102,7 @@ public class MergeTests extends BaseTest {
 		gitlet("commit", "say hi"); //com1
 		gitlet("branch", "dev");
 		createFile("foo", "hello");
-		createFile("yo", "bar");
+		createFile("bar", "yo");
 		gitlet("add", "foo");
 		gitlet("add", "bar");
 		gitlet("commit", "say hello"); //comL
@@ -127,7 +138,7 @@ public class MergeTests extends BaseTest {
 		gitlet("commit", "say hi"); //com1
 		gitlet("branch", "dev");
 		createFile("foo", "hello");
-		createFile("yo", "bar");
+		createFile("bar", "yo");
 		gitlet("add", "foo");
 		gitlet("add", "bar");
 		gitlet("commit", "say hello"); //comL
@@ -137,7 +148,7 @@ public class MergeTests extends BaseTest {
 		checkAndDelete("baz");
 		
 		//Act
-		String[] result3 = gitletErr("merge", "master");
+		String[] result3 = gitletErr("merge", "dev");
 		
 		//Assert
 		assertEquals("",result3[1]);

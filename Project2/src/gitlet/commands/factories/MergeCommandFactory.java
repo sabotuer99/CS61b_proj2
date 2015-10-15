@@ -20,7 +20,7 @@ public class MergeCommandFactory implements ICommandFactory {
 	@Override
 	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return new MergeCommand(args);
+		return new MergeCommand(args[1]);
 	}
 
 }
