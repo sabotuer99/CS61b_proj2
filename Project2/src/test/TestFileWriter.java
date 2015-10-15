@@ -188,6 +188,13 @@ public class TestFileWriter implements IFileWriter {
 		return savedCommits.keySet().toArray(new String[0]);
 	}
 
+	@Override
+	public void deleteBranch(String branch) {
+		String branchPath = ".gitlet/refs/heads/" + branch;
+		branches.remove(branchPath);
+		createdFiles.remove(branchPath);
+	}
+
 
 
 }

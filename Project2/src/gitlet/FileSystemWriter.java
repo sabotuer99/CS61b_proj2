@@ -359,4 +359,10 @@ public class FileSystemWriter implements IFileWriter {
 		return objects.list(filter);
 	}
 
+	@Override
+	public void deleteBranch(String branch) {
+		File f = new File(".gitlet/refs/heads/" + branch);
+		f.delete();
+	}
+
 }

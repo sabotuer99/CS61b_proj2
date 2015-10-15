@@ -11,13 +11,13 @@ import java.util.Scanner;
 public class Gitlet {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		//.gitlet/HEAD holds reference to the current branch
 		//.gitlet/refs/heads/ folder with a file for each branch
-		
-		//
-		
+		//.gitlet/objects/<commitId>/ folder stores commit file object as binary data, 
+		//    and mirrors files added to that commit
+		//.gitlet/objects/staging is binary file holding the staging information
+
 		//if args is null, output on StdErr, return;
 		if(args.length == 0){
 			System.err.println("Need a subcommand");
@@ -65,6 +65,7 @@ public class Gitlet {
 		commands.add(new CheckoutCommandFactory());
 		commands.add(new GlobalLogCommandFactory());
 		commands.add(new FindCommandFactory());
+		commands.add(new RmBranchCommandFactory());
 		
 		return commands;
 	}

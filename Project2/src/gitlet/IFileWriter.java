@@ -22,4 +22,5 @@ public interface IFileWriter {
 	String getCurrentBranch();
 	boolean filesEqual(String file1, String file2);
 	String[] getAllCommitIds();
+	void deleteBranch(String branch);
 }
