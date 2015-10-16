@@ -20,7 +20,7 @@ public class RebaseCommandFactory implements ICommandFactory {
 	@Override
 	public ICommand makeCommand(String[] args) {
 		// TODO Auto-generated method stub
-		return new RebaseCommand(args);
+		return new RebaseCommand(args[1]);
 	}
 
 }

@@ -37,7 +37,7 @@ public class RebaseTests extends BaseTest {
 		gitlet("commit", "say hi");
 		gitlet("branch", "dev");
 		createFile("foo", "hello");
-		createFile("yo", "bar");
+		createFile("bar", "yo");
 		gitlet("add", "foo");
 		gitlet("add", "bar");
 		gitlet("commit", "say hello"); 		
@@ -107,7 +107,7 @@ public class RebaseTests extends BaseTest {
 		gitlet("init");
 		
 		//Act
-		String[] result = gitletErr("merge", "master");
+		String[] result = gitletErr("rebase", "master");
 		
 		//Assert
 		assertEquals("Cannot rebase a branch with itself.", result[0]);

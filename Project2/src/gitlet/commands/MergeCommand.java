@@ -1,6 +1,5 @@
 package gitlet.commands;
 
-import static org.junit.Assert.assertEquals;
 import gitlet.Commit;
 import gitlet.FileWriterFactory;
 import gitlet.IFileWriter;

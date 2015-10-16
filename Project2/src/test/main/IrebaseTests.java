@@ -37,7 +37,7 @@ public class IrebaseTests extends BaseTest {
 		gitlet("commit", "say hi");
 		gitlet("branch", "dev");
 		createFile("foo", "hello");
-		createFile("yo", "bar");
+		createFile("bar", "yo");
 		gitlet("add", "foo");
 		gitlet("add", "bar");
 		gitlet("commit", "say hello"); 		
