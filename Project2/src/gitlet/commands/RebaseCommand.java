@@ -84,6 +84,8 @@ public class RebaseCommand implements ICommand {
 		
 		replayFromSplit(current, branch, split);
 		
+		new ResetCommand(fileWriter.getCurrentHeadPointer()).execute();
+		
 		return true;
 	}
 	
@@ -107,8 +109,8 @@ public class RebaseCommand implements ICommand {
 			String parentCommit = parentFP.get(file);
 			
 			if(!fileCommit.equals(parentCommit)){
-				new CheckoutFileCommand(fileCommit, file);
-				new AddCommand(file);//filesToAdd.add(file);
+				new CheckoutFileCommand(fileCommit, file).execute();
+				new AddCommand(file).execute();//filesToAdd.add(file);
 			}
 				
 		}
@@ -118,13 +120,12 @@ public class RebaseCommand implements ICommand {
 			Set<String> currentFiles = currentFP.keySet();
 			
 			if(!currentFiles.contains(file) && other.getFilePointers().keySet().contains(file)){
-				new RmCommand(file);
+				new RmCommand(file).execute();
 				//filesToRm.add(file);
 			}
 		}
 		
 		//commit
-		
 		if(isInteractive){
 			Scanner stdin = new Scanner(System.in);
 			String choice = null;
@@ -133,7 +134,7 @@ public class RebaseCommand implements ICommand {
 				choice = stdin.nextLine();
 				switch(choice){
 				case "c":
-					new CommitCommand(current.getMessage());
+					new CommitCommand(current.getMessage()).execute();
 					break;
 				case "s":
 					//if this is first or last commit, tell user they can't pick this... hmmmm
@@ -148,7 +149,7 @@ public class RebaseCommand implements ICommand {
 							message = null;
 						}
 					}
-					new CommitCommand(message);
+					new CommitCommand(message).execute();
 					break;
 				default:
 					choice = null;
@@ -157,7 +158,7 @@ public class RebaseCommand implements ICommand {
 			}
 			stdin.close();
 		} else {
-			new CommitCommand(current.getMessage());
+			new CommitCommand(current.getMessage()).execute();
 		}
 	}
 }

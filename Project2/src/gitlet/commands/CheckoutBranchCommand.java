@@ -23,6 +23,14 @@ public class CheckoutBranchCommand implements ICommand {
 
 	@Override
 	public boolean execute() {
+		
+		//if branch doesn't exist, print message and fail
+		if(!fileWriter.exists(".gitlet/refs/heads/" + branch)){
+			System.out.println("A branch with that name does not exist.");
+			System.err.println("Branch does not exist");
+			return false;
+		}
+		
 		//if branch is current branch, print error and return false
 		if(branch.equals(fileWriter.getCurrentBranch())){
 			System.out.println("No need to checkout the current branch.");

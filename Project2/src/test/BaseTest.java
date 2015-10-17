@@ -33,6 +33,7 @@ public class BaseTest {
     protected boolean captureStreams;
     protected boolean echoStreams;
     private List<String> createdFiles;
+    private String stdinInput;
     
     protected PrintStream originalOut = System.out;
     protected PrintStream originalErr = System.err;
@@ -61,6 +62,7 @@ public class BaseTest {
         stripNewLines = true;
         captureStreams = true;
         echoStreams = false;
+        stdinInput = "yes";
     }
     
     @After
@@ -140,7 +142,7 @@ public class BaseTest {
          * will type "yes". You won't be able to take user input during this
          * time.
          */
-        String answer = "yes";
+        String answer = stdinInput;
         InputStream is = new ByteArrayInputStream(answer.getBytes());
         System.setIn(is);
         

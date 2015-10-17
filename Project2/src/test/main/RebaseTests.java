@@ -1,6 +1,6 @@
 package test.main;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
@@ -112,6 +112,146 @@ public class RebaseTests extends BaseTest {
 		//Assert
 		assertEquals("Cannot rebase a branch with itself.", result[0]);
 		assertEquals("",result[1]);
+	}
+	
+	@Test
+	public void rebase_normalOperation(){
+//      Before	
+//		#                  ----  comL* < master
+//		#  com0* --- com1
+//		#                  ----  comR ---- orphan*
+//		#                         ^
+//		#                        dev
+		
+//      After	
+//                              master     dev
+//                                v         v
+//		#                  ----  comL* ---- comRR 
+//		#  com0* --- com1
+//		#                  ----  comR  ---- orphan*
+//		#                         
+//		#                        
+		
+		//Arrange
+		echoStreams = true;
+		gitlet("init"); //com0
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi"); //com1
+		gitlet("branch", "dev");
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello"); //comL
+		String comL = getLastCommitId(gitlet("log"));
+		gitlet("checkout", "dev");
+		createFile("foo", "love me!");
+		gitlet("add", "foo");
+		gitlet("commit", "hawayu"); //comR
+		checkAndDelete("foo");
+		String comR = getLastCommitId(gitlet("log"));
+		
+		//Act
+		gitlet("rebase", "master");
+		String comRR = getLastCommitId(gitlet("log"));
+		String log = gitlet("log");
+		String[] commits = log.split("====");
+		
+		//Assert
+		assertNotSame(comR, comRR);
+		assertEquals(5, commits.length);
+		assertTrue(commits[1].contains("hawayu"));
+		assertTrue(commits[2].contains(comL));
+		assertTrue(commits[3].contains("say hi"));
+		assertEquals("love me!", getText("foo"));
+	}
+	
+	@Test
+	public void rebase_normalOperationLongerChainWithRm(){
+//      Before	
+//		#                  ----  comL* < master
+//		#  com0* --- com1
+//		#                  ----  comR1 ---- comR2 ---- comR3*
+//		#                                                ^
+//		#                                               dev
+		
+//      After	
+//                              master                                dev
+//                                v                                    v
+//		#                  ----  comL* ---- comR1R ---- comR2R ---- comR3R* 
+//		#  com0* --- com1
+//		#                  ----  comR1 ---- comR2 ---- comR3
+//		#                         
+//		#                        
+		
+		//Arrange
+		gitlet("init"); //com0
+		File f = new File(System.getProperty("user.dir"));
+		int baselineFileCount = f.list().length;
+		
+		echoStreams = true;
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi"); //com1
+		gitlet("branch", "dev");
+		createFile("foo", "hello");
+		createFile("test", "nobody knows the trouble I seen");
+		gitlet("add", "foo");
+		gitlet("add", "test");
+		gitlet("commit", "say hello"); //comL
+		checkAndDelete("test");
+		checkAndDelete("foo");
+		String comL = getLastCommitId(gitlet("log"));
+		gitlet("checkout", "dev");
+		createFile("foo", "love me!");
+		gitlet("add", "foo");
+		gitlet("commit", "all your base"); //comR1
+		checkAndDelete("foo");
+		String comR1 = getLastCommitId(gitlet("log"));
+		createFile("bar", "love me more!");
+		gitlet("add", "bar");
+		gitlet("commit", "are belong"); //comR2
+		checkAndDelete("bar");
+		String comR2 = getLastCommitId(gitlet("log"));
+		createFile("baz", "I hate foo!");
+		gitlet("add", "baz");
+		gitlet("rm", "foo");
+		gitlet("commit", "to us"); //comR3
+		checkAndDelete("baz");
+		String comR3 = getLastCommitId(gitlet("log"));
+		
+		//Act
+		gitlet("rebase", "master");
+		String comR3R = getLastCommitId(gitlet("log"));
+		String log = gitlet("log");
+		String[] commits = log.split("====");
+		
+		//Assert
+		assertNotSame(comR3R, comR3);
+		assertEquals(7, commits.length);
+		assertTrue(commits[1].contains("to us"));
+		assertFalse(commits[1].contains(comR3));
+		assertTrue(commits[2].contains("are belong"));
+		assertFalse(commits[1].contains(comR2));
+		assertTrue(commits[3].contains("all your base"));
+		assertFalse(commits[1].contains(comR1));
+		assertTrue(commits[4].contains(comL));
+		assertTrue(commits[5].contains("say hi"));
+		assertEquals("love me!", getText("foo"));
+		assertEquals("love me more!", getText("bar"));
+		assertEquals("I hate foo!", getText("baz"));
+		assertEquals("nobody knows the trouble I seen", getText("test"));
+		
+		checkAndDelete("test");
+		checkAndDelete("foo");
+		checkAndDelete("bar");
+		checkAndDelete("baz");
+		
+		gitlet("reset", comR3R);
+		assertEquals("extra files detected.", baselineFileCount + 3, f.list().length);	
+		assertEquals("", getText("foo"));
+		assertEquals("love me more!", getText("bar"));
+		assertEquals("I hate foo!", getText("baz"));
+		assertEquals("nobody knows the trouble I seen", getText("test"));
 	}
 
 }
