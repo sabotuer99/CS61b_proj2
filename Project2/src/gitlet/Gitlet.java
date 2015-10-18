@@ -41,7 +41,7 @@ public class Gitlet {
 						+ "in your working directory. Uncommitted changes may be lost. "
 						+ "Are you sure you want to continue? (yes/no)");
 				Scanner stdin = new Scanner(System.in);
-				String answer = stdin.next();
+				String answer = stdin.nextLine();
 				if(!"yes".equals(answer))
 					canExecute = false;
 				stdin.close();

@@ -70,27 +70,21 @@ public class RebaseCommand implements ICommand {
 			return false;
 		}
 		
-//		List<String> currentMod = new ArrayList<String>();
-//		List<String> otherMod = new ArrayList<String>();
-//		HashMap<String, String> currentFP = current.getFilePointers();
-//		HashMap<String, String> otherFP = other.getFilePointers();
-//		HashMap<String, String> splitFP = split.getFilePointers();
-		
 		//move current branch to point at head of target branch, so 
 		//commits will continue from there
 		fileWriter.createFile(fileWriter.getCurrentBranchRef(), other.getId());
 		
-		replayFromSplit(current, branch, split);
+		replayFromSplit(current, branch, split, 0);
 		
 		new ResetCommand(fileWriter.getCurrentHeadPointer()).execute();
 		
 		return true;
 	}
 	
-	private void replayFromSplit(Commit current, String targetBranch, Commit split){
+	private void replayFromSplit(Commit current, String targetBranch, Commit split, int depth){
 		
 		if(current.getParent() != null && !current.getParent().equals(split)){
-			replayFromSplit(current.getParent(), targetBranch, split);
+			replayFromSplit(current.getParent(), targetBranch, split, depth + 1);
 		}
 		
 		//get other commmit head
@@ -129,13 +123,19 @@ public class RebaseCommand implements ICommand {
 			String choice = null;
 			while(choice == null){
 				System.out.println("Would you like to (c)ontinue, (s)kip this commit, or change this commit's (m)essage?");
-				choice = stdin.next();
+				choice = stdin.nextLine();
 				switch(choice){
 				case "c":
 					new CommitCommand(current.getMessage()).execute();
 					break;
 				case "s":
-					//if this is first or last commit, tell user they can't pick this... hmmmm
+					//if this is first or last commit of branch, tell user they can't pick this... 
+					if(current.getParent().equals(split) || depth == 0){
+						System.out.println("Cannot skip first or last commit!");
+						choice = null;
+					} else {
+						// don't commit
+					}
 					break;
 				case "m":
 					String message = null;
