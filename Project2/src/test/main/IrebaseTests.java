@@ -1,8 +1,12 @@
 package test.main;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -114,4 +118,56 @@ public class IrebaseTests extends BaseTest {
 		assertEquals("",result[1]);
 	}
 
+	@SuppressWarnings("serial")
+	@Test
+	public void irebase_normalOperation(){
+//      Before	
+//		#                  ----  comL* < master
+//		#  com0* --- com1
+//		#                  ----  comR ---- orphan*
+//		#                         ^
+//		#                        dev
+		
+//      After	
+//                              master     dev
+//                                v         v
+//		#                  ----  comL* ---- comRR 
+//		#  com0* --- com1
+//		#                  ----  comR  ---- orphan*
+//		#                         
+//		#                        
+		
+		//Arrange
+		echoStreams = true;
+		gitlet("init"); //com0
+		createFile("foo", "hi");
+		gitlet("add", "foo");
+		gitlet("commit", "say hi"); //com1
+		gitlet("branch", "dev");
+		createFile("foo", "hello");
+		gitlet("add", "foo");
+		gitlet("commit", "say hello"); //comL
+		String comL = getLastCommitId(gitlet("log"));
+		gitlet("checkout", "dev");
+		createFile("foo", "love me!");
+		gitlet("add", "foo");
+		gitlet("commit", "hawayu"); //comR
+		checkAndDelete("foo");
+		String comR = getLastCommitId(gitlet("log"));
+		
+		//Act
+		setStdinInput(Arrays.asList(new String[]{"yes", "c"}));
+		System.out.println(gitlet("i-rebase", "master"));
+		String comRR = getLastCommitId(gitlet("log"));
+		String log = gitlet("log");
+		String[] commits = log.split("====");
+		
+		//Assert
+		assertNotSame(comR, comRR);
+		assertEquals(5, commits.length);
+		assertTrue(commits[1].contains("hawayu"));
+		assertTrue(commits[2].contains(comL));
+		assertTrue(commits[3].contains("say hi"));
+		assertEquals("love me!", getText("foo"));
+	}
 }

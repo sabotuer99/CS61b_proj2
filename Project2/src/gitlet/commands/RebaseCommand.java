@@ -23,9 +23,7 @@ public class RebaseCommand implements ICommand {
 	}
 	
 	public RebaseCommand(String branch) {
-		this.branch = branch;
-		fileWriter = FileWriterFactory.getWriter();
-		isInteractive = false;
+		this(branch, false);
 	}
 
 	@Override
@@ -131,7 +129,7 @@ public class RebaseCommand implements ICommand {
 			String choice = null;
 			while(choice == null){
 				System.out.println("Would you like to (c)ontinue, (s)kip this commit, or change this commit's (m)essage?");
-				choice = stdin.nextLine();
+				choice = stdin.next();
 				switch(choice){
 				case "c":
 					new CommitCommand(current.getMessage()).execute();

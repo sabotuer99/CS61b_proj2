@@ -26,21 +26,22 @@ public class Gitlet {
 		
 		List<ICommandFactory> availableCommands = getAvailableCommands();
 		
+		
 		CommandParser parser = new CommandParser(availableCommands);
 		ICommand command = parser.parseCommand(args);
+		
 		
 		//if command == null, then the user did not specify a valid command
 		if(null == command){
 			System.err.println("Unknown command: " + args[0]);
 		} else {
 			boolean canExecute = true;
-			
 			if(command.isDangerous()){
 				System.out.println("Warning: The command you entered may alter the files "
 						+ "in your working directory. Uncommitted changes may be lost. "
 						+ "Are you sure you want to continue? (yes/no)");
 				Scanner stdin = new Scanner(System.in);
-				String answer = stdin.nextLine();
+				String answer = stdin.next();
 				if(!"yes".equals(answer))
 					canExecute = false;
 				stdin.close();
@@ -49,6 +50,7 @@ public class Gitlet {
 			if(canExecute)
 				command.execute();
 		}
+		
 		
 	}
 
